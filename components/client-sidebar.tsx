@@ -41,11 +41,6 @@ const defaultNavItems = [
     href: "/client/vaccination",
     icon: Syringe,
   },
-  {
-    title: "Hồ sơ nhân sự",
-    href: "/client/documents",
-    icon: FileText,
-  },
 ]
 
 export function ClientSidebar() {

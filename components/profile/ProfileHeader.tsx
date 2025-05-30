@@ -23,7 +23,7 @@ export function ProfileHeader({
         </p>
       </div>
       <div className="flex gap-2">
-        <Button variant="outline" onClick={onDownloadPDF} disabled={isLoading}>
+        {/* <Button variant="outline" onClick={onDownloadPDF} disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -35,7 +35,7 @@ export function ProfileHeader({
               Tải PDF
             </>
           )}
-        </Button>
+        </Button> */}
         <Button onClick={onSave} disabled={isSaving}>
           {isSaving ? (
             <>
