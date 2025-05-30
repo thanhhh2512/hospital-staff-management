@@ -241,7 +241,7 @@ export default function VaccinationPage() {
             </SheetDescription>
           </SheetHeader>
 
-          {selectedVaccination && (
+              {selectedVaccination && (
             <VaccinationDetail
               vaccination={selectedVaccination}
               certificates={certificates}
