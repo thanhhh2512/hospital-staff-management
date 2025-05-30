@@ -5,7 +5,7 @@ import { ModeToggle } from "@/components/mode-toggle"
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-8">
         <div className="container flex h-14 items-center justify-between">
           <div className="flex items-center gap-2 font-bold">
             <span className="hidden sm:inline-block">Hệ Thống Quản Lý Nhân Viên Bệnh Viện</span>
