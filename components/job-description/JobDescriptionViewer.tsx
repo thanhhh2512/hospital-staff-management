@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { JobDescription } from "./types";
+import type { JobDescription } from "@/types";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 
 interface JobDescriptionViewerProps {
@@ -38,4 +38,4 @@ export function JobDescriptionViewer({
       </DialogContent>
     </Dialog>
   );
-} 
+}

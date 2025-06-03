@@ -1,6 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -19,10 +21,19 @@ import {
 } from "@/components/ui/card";
 import { ModeToggle } from "@/components/mode-toggle";
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+// Zod schema
+const formSchema = z.object({
+  email: z.string().email("Email không hợp lệ"),
+  password: z
+    .string()
+    .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
+    .regex(/[a-z]/, "Phải có ít nhất một chữ thường")
+    .regex(/[A-Z]/, "Phải có ít nhất một chữ hoa")
+    .regex(/[0-9]/, "Phải có ít nhất một chữ số")
+    .regex(/[^a-zA-Z0-9]/, "Phải có ít nhất một ký tự đặc biệt"),
+});
+
+type LoginFormData = z.infer<typeof formSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,17 +44,16 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>();
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(formSchema),
+  });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
 
     setTimeout(() => {
       setIsLoading(false);
-      if (
-        data.email === "admin@gmail.com" &&
-        data.password === "admin123"
-      ) {
+      if (data.email === "admin@gmail.com" && data.password === "Admin_123") {
         router.push("/admin/dashboard");
       } else {
         router.push("/client/dashboard");
@@ -72,7 +82,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   placeholder="example@hospital.com"
-                  {...register("email", { required: "Email không được để trống" })}
+                  {...register("email")}
                 />
                 {errors.email && (
                   <p className="text-sm text-red-500">{errors.email.message}</p>
@@ -93,10 +103,8 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    {...register("password", {
-                      required: "Mật khẩu không được để trống",
-                    })}
+                    placeholder="Nhập mật khẩu"
+                    {...register("password")}
                   />
                   <Button
                     type="button"
@@ -116,7 +124,9 @@ export default function LoginPage() {
                   </Button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                  <p className="text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
 

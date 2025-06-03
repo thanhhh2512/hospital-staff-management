@@ -9,10 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Certificate } from "./types";
+import type { VaccinationCertificate } from "@/types";
 
 interface CertificateListProps {
-  certificates: Certificate[];
+  certificates: VaccinationCertificate[];
   onViewFile?: (file: string) => void;
 }
 

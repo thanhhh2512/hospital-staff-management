@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { VaccinationFormData } from "./types";
+import type { VaccinationFormData } from "@/types";
 
 const vaccinationFormSchema = z.object({
   name: z.string().min(2, { message: "Tên vắc xin phải có ít nhất 2 ký tự" }),

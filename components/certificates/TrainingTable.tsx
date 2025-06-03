@@ -7,16 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-interface TrainingHistory {
-  id: string;
-  school: string;
-  major: string;
-  startDate: string;
-  endDate: string;
-  type: string;
-  degree: string;
-}
+import type { TrainingHistory } from "@/types";
 
 interface TrainingTableProps {
   trainingHistory: TrainingHistory[];
@@ -64,9 +55,7 @@ export function TrainingTable({
                     key={training.id}
                     className="border-b transition-colors hover:bg-muted/50"
                   >
-                    <td className="p-4 align-middle">
-                      {training.school}
-                    </td>
+                    <td className="p-4 align-middle">{training.school}</td>
                     <td className="p-4 align-middle">{training.major}</td>
                     <td className="p-4 align-middle">
                       {training.startDate} - {training.endDate}
@@ -86,4 +75,4 @@ export function TrainingTable({
       </CardContent>
     </Card>
   );
-} 
+}

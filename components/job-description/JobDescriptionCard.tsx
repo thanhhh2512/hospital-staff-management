@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Eye, Download } from "lucide-react";
-import { JobDescription } from "./types";
+import type { JobDescription } from "@/types";
 import { generateJobDescriptionPDF } from "@/components/profile/pdfUtils";
 
 interface JobDescriptionCardProps {
@@ -29,7 +29,7 @@ export function JobDescriptionCard({ job, onView }: JobDescriptionCardProps) {
         <div className="flex items-start justify-between">
           <CardTitle className="line-clamp-2">{job.title}</CardTitle>
           <Badge variant={job.status === "active" ? "default" : "secondary"}>
-            {job.status === "active" ? "Hiện hành" : "Lưu trữ"}
+            {job.status === "active" ? "Hiện hành" : "Không hoạt động"}
           </Badge>
         </div>
         <CardDescription>{job.department}</CardDescription>

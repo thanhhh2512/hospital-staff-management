@@ -237,8 +237,8 @@ export const generateProfilePDF = async (
     pdf.text(title, pageWidth / 2, margin.top, { align: "center" });
 
     if (avatarSrc) {
-      const imgWidth = 24;
-      const imgHeight = 32;
+      const imgWidth = 32;
+      const imgHeight = 44;
       pdf.addImage(
         avatarSrc,
         "JPEG",

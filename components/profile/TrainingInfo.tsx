@@ -7,8 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useTrainingStore } from "@/stores";
+import type { TrainingHistory } from "@/types";
 
 export function TrainingInfo() {
+  const { trainings } = useTrainingStore();
+
   return (
     <Card>
       <CardHeader>
@@ -41,15 +45,31 @@ export function TrainingInfo() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b transition-colors hover:bg-muted/50">
+                {trainings.length > 0 ? (
+                  trainings.map((training: TrainingHistory) => (
+                    <tr
+                      key={training.id}
+                      className="border-b transition-colors hover:bg-muted/50"
+                    >
+                      <td className="p-4 align-middle">{training.school}</td>
+                      <td className="p-4 align-middle">{training.major}</td>
                   <td className="p-4 align-middle">
-                    Trường ĐHYD.TP Hồ Chí Minh
+                        {training.startDate} - {training.endDate}
+                      </td>
+                      <td className="p-4 align-middle">{training.type}</td>
+                      <td className="p-4 align-middle">{training.degree}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="p-4 text-center text-muted-foreground"
+                    >
+                      Chưa có thông tin đào tạo
                   </td>
-                  <td className="p-4 align-middle">Xét nghiệm</td>
-                  <td className="p-4 align-middle">11/2009 - 10/2012</td>
-                  <td className="p-4 align-middle">Liên thông</td>
-                  <td className="p-4 align-middle">Cử nhân</td>
                 </tr>
+                )}
               </tbody>
             </table>
           </div>

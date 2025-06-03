@@ -8,16 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-interface Certificate {
-  id: string;
-  name: string;
-  type: string;
-  issueDate: string;
-  issuer: string;
-  description: string;
-  file: string | null;
-}
+import type { Certificate } from "@/types";
 
 interface CertificateDetailProps {
   open: boolean;
@@ -73,7 +64,9 @@ export function CertificateDetail({
           <div className="grid gap-4">
             <div className="grid grid-cols-3 items-center gap-4">
               <span className="font-medium">Ngày cấp:</span>
-              <span className="col-span-2">{formatDate(certificate.issueDate)}</span>
+              <span className="col-span-2">
+                {formatDate(certificate.issueDate)}
+              </span>
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <span className="font-medium">Đơn vị cấp:</span>
@@ -91,11 +84,9 @@ export function CertificateDetail({
           <Button variant="outline" onClick={onClose}>
             Đóng
           </Button>
-          <Button onClick={handleEdit}>
-            Chỉnh sửa
-          </Button>
+          <Button onClick={handleEdit}>Chỉnh sửa</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-} 
+}

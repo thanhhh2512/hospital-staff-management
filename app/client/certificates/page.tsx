@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
 import {
   CertificateHeader,
   CertificateList,
@@ -12,68 +11,21 @@ import {
   DeleteConfirmation,
 } from "@/components/certificates";
 import { generatePDF } from "@/components/profile/pdfUtils";
-import { generatePDFWithPdfMake } from "@/components/profile/pdfmakeUtils";
+import { useCertificateStore } from "@/stores/useCertificateStore";
 import { PrintContainer } from "@/components/ui/print-container";
-
-interface Certificate {
-  id: string;
-  name: string;
-  type: string;
-  issueDate: string;
-  issuer: string;
-  description: string;
-  file: string | null;
-}
-
-interface TrainingHistory {
-  id: string;
-  school: string;
-  major: string;
-  startDate: string;
-  endDate: string;
-  type: string;
-  degree: string;
-}
-
-// Mock data
-const mockCertificates: Certificate[] = [
-  {
-    id: "1",
-    name: "Bằng Cử nhân Xét nghiệm",
-    type: "degree",
-    issueDate: "2012-10-30",
-    issuer: "Trường ĐHYD.TP Hồ Chí Minh",
-    description: "Tốt nghiệp loại Khá",
-    file: null,
-  },
-  {
-    id: "2",
-    name: "Chứng chỉ hành nghề Xét nghiệm",
-    type: "certificate",
-    issueDate: "2013-05-15",
-    issuer: "Bộ Y tế",
-    description: "Chứng chỉ hành nghề cho kỹ thuật viên xét nghiệm",
-    file: null,
-  },
-];
-
-const mockTrainingHistory: TrainingHistory[] = [
-  {
-    id: "1",
-    school: "Trường ĐHYD.TP Hồ Chí Minh",
-    major: "Xét nghiệm",
-    startDate: "11/2009",
-    endDate: "10/2012",
-    type: "Liên thông",
-    degree: "Cử nhân",
-  },
-];
+import type { Certificate, TrainingHistory } from "@/types";
 
 export default function CertificatesPage() {
-  const [certificates, setCertificates] =
-    useState<Certificate[]>(mockCertificates);
-  const [trainingHistory, setTrainingHistory] =
-    useState<TrainingHistory[]>(mockTrainingHistory);
+  const {
+    certificates,
+    trainingHistory,
+    addCertificate,
+    updateCertificate,
+    deleteCertificate,
+    addTraining,
+    updateTraining,
+    deleteTraining,
+  } = useCertificateStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isCertificateFormOpen, setIsCertificateFormOpen] = useState(false);
@@ -123,13 +75,9 @@ export default function CertificatesPage() {
     if (!itemToDelete) return;
 
     if (deleteType === "certificate") {
-      setCertificates((prev) =>
-        prev.filter((cert) => cert.id !== itemToDelete)
-      );
+      deleteCertificate(itemToDelete);
     } else {
-      setTrainingHistory((prev) =>
-        prev.filter((train) => train.id !== itemToDelete)
-      );
+      deleteTraining(itemToDelete);
     }
 
     setIsDeleteDialogOpen(false);
@@ -138,45 +86,26 @@ export default function CertificatesPage() {
 
   const handleSaveCertificate = (formData: Omit<Certificate, "id">) => {
     if (selectedCertificate) {
-      // Edit existing
-      setCertificates((prev) =>
-        prev.map((cert) =>
-          cert.id === selectedCertificate.id
-            ? { ...formData, id: cert.id }
-            : cert
-        )
-      );
+      updateCertificate(selectedCertificate.id, formData);
     } else {
-      // Add new
-      setCertificates((prev) => [...prev, { ...formData, id: uuidv4() }]);
+      addCertificate(formData);
     }
+    setIsCertificateFormOpen(false);
   };
 
   const handleSaveTraining = (formData: Omit<TrainingHistory, "id">) => {
     if (selectedTraining) {
-      // Edit existing
-      setTrainingHistory((prev) =>
-        prev.map((train) =>
-          train.id === selectedTraining.id
-            ? { ...formData, id: train.id }
-            : train
-        )
-      );
+      updateTraining(selectedTraining.id, formData);
     } else {
-      // Add new
-      setTrainingHistory((prev) => [...prev, { ...formData, id: uuidv4() }]);
+      addTraining(formData);
     }
+    setIsTrainingFormOpen(false);
   };
 
   const handleDownloadPDF = async () => {
     setIsLoading(true);
     try {
-      // We have two options, uncomment the one you prefer
-      // Option 1: Using jsPDF with autoTable
       await generatePDF(printRef.current);
-
-      // Option 2: Using pdfmake
-      // await generatePDFWithPdfMake(printRef.current);
     } catch (error) {
       console.error("Error generating PDF:", error);
     } finally {

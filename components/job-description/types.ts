@@ -3,6 +3,6 @@ export interface JobDescription {
   title: string;
   department: string;
   uploadDate: string;
-  status: "active" | "archived";
+  status: "active" | "inactive";
   content: string;
 }

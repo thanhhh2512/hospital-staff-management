@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Vaccination } from "./types";
+import type { Vaccination } from "@/types";
 
 interface VaccinationCardProps {
   vaccination: Vaccination;

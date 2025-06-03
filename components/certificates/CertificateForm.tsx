@@ -19,16 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
-
-interface Certificate {
-  id: string;
-  name: string;
-  type: string;
-  issueDate: string;
-  issuer: string;
-  description: string;
-  file: string | null;
-}
+import type { Certificate } from "@/types";
 
 interface CertificateFormProps {
   open: boolean;
@@ -63,7 +54,7 @@ export function CertificateForm({
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = (value: Certificate["type"]) => {
     setFormData({ ...formData, type: value });
   };
 

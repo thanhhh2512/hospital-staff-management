@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CertificateList } from "./CertificateList";
-import { Certificate, Vaccination } from "./types";
+import type { Vaccination, VaccinationCertificate } from "@/types";
 
 interface VaccinationDetailProps {
   vaccination: Vaccination;
-  certificates: Certificate[];
+  certificates: VaccinationCertificate[];
   onViewFile?: (file: string) => void;
 }
 
@@ -85,7 +85,7 @@ export function VaccinationDetail({
                     variant="outline"
                     onClick={() => onViewFile?.(vaccination.file!)}
                   >
-                    <Eye  className="h-4 w-4 mr-1" />
+                    <Eye className="h-4 w-4 mr-1" />
                     Xem
                   </Button>
                 </div>

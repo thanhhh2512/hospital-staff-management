@@ -2,6 +2,10 @@ import { RefObject, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { generateProfilePDF } from "./pdfUtils";
+import { useProfileStore } from "@/stores";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { FileDown } from 'lucide-react';
 
 interface ProfilePreviewProps {
   profileRef: RefObject<HTMLDivElement | null>;
@@ -9,9 +13,31 @@ interface ProfilePreviewProps {
 }
 
 export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
+  const { profile } = useProfileStore();
+
   const handleExportPDF = () => {
     if (profileRef.current) {
       generateProfilePDF(profileRef.current, avatarSrc);
+    }
+  };
+
+  if (!profile) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex h-[600px] items-center justify-center">
+            <p className="text-muted-foreground">Không có dữ liệu</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), "dd/MM/yyyy", { locale: vi });
+    } catch (error) {
+      return dateString;
     }
   };
 
@@ -25,7 +51,7 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
             size="sm"
             className="flex items-center gap-2"
           >
-            <span className="material-icons text-sm">download</span>
+            <span className="material-icons text-sm"><FileDown /></span>
             Xuất PDF
           </Button>
         </div>
@@ -42,37 +68,39 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
             <div className="mt-4 flex items-start justify-between">
               <div className="flex-1 space-y-2 text-left">
                 <p>
-                  <span className="font-semibold">1) Họ và tên:</span> LÊ THỊ
-                  MỨC
+                  <span className="font-semibold">1) Họ và tên:</span>{" "}
+                  {profile.fullName.toUpperCase()}
                 </p>
                 <p>
                   <span className="font-semibold">2) Ngày sinh:</span>{" "}
-                  11/03/1983
+                  {formatDate(profile.dob)}
                 </p>
                 <p>
-                  <span className="font-semibold">3) Quê quán:</span> Ấp Đông
-                  Giữa, Xã Nam Thái, Huyện An Biên, Tỉnh Kiên Giang
+                  <span className="font-semibold">3) Quê quán:</span>{" "}
+                  {profile.hometown}
                 </p>
                 <p>
                   <span className="font-semibold">4) Điện thoại:</span>{" "}
-                  0919.474.649
+                  {profile.phone}
                 </p>
                 <p>
                   <span className="font-semibold">5) Email:</span>{" "}
-                  muchau99@gmail.com
+                  {profile.email}
                 </p>
                 <p>
-                  <span className="font-semibold">6) Dân tộc:</span> Kinh
+                  <span className="font-semibold">6) Dân tộc:</span>{" "}
+                  {profile.ethnicity}
                 </p>
                 <p>
-                  <span className="font-semibold">7) Tôn giáo:</span> Không
+                  <span className="font-semibold">7) Tôn giáo:</span>{" "}
+                  {profile.religion}
                 </p>
               </div>
-              <div className="ml-4 flex-shrink-0">
-                <div className="h-32 w-24 overflow-hidden rounded border">
-                  {avatarSrc ? (
+              <div className="mx-6  flex-shrink-0">
+                <div className="h-44 w-32 overflow-hidden rounded border">
+                  {avatarSrc || profile.avatar ? (
                     <img
-                      src={avatarSrc || "/placeholder.svg"}
+                      src={avatarSrc || profile.avatar || "/placeholder.svg"}
                       alt="Avatar"
                       className="h-full w-full object-cover"
                     />
@@ -89,84 +117,92 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
                 <span className="font-semibold">
                   8) Nơi đăng ký hộ khẩu thường trú:
                 </span>{" "}
-                Ấp Đông Giữa, Xã Nam Thái, Huyện An Biên, Tỉnh Kiên Giang
+                {profile.permanentAddress}
               </p>
               <p>
-                <span className="font-semibold">9) Nơi ở hiện nay:</span> Số 204
-                Trần Việt Châu Phường An Hòa Quận Ninh Kiều TP. Cần Thơ
+                <span className="font-semibold">9) Nơi ở hiện nay:</span>{" "}
+                {profile.currentAddress}
               </p>
               <p>
                 <span className="font-semibold">
                   10) Nghề nghiệp khi được tuyển dụng:
                 </span>{" "}
-                Kỹ thuật viên xét nghiệm đa khoa
+                {profile.jobTitle}
               </p>
               <p>
                 <span className="font-semibold">11) Ngày tuyển dụng:</span>{" "}
-                10/08/2006, Cơ quan tuyển dụng: BVĐK Trung Ương Cần Thơ
+                {formatDate(profile.hireDate)}, Cơ quan tuyển dụng:{" "}
+                {profile.hireAgency}
               </p>
               <p>
                 <span className="font-semibold">12) Chức vụ hiện tại:</span>{" "}
+                {profile.position}
               </p>
               <p>
                 <span className="font-semibold">
                   13) Công việc chính được giao:
                 </span>{" "}
-                Chuyên khoa xét nghiệm
+                {profile.department}
               </p>
               <p>
-                <span className="font-semibold">14) Ngạch viên chức:</span> Kỹ
-                thuật y hạng III, Mã ngạch: V.08.07.18
+                <span className="font-semibold">14) Ngạch viên chức:</span>{" "}
+                {profile.rank}
               </p>
               <p>
-                <span className="font-semibold">15) Bậc lương:</span> 5/9, Hệ
-                số: 3.66, Ngày hưởng: 15/07/2022
+                <span className="font-semibold">15) Bậc lương:</span>{" "}
+                {profile.salary}, Ngày hưởng: {formatDate(profile.salaryDate)}
               </p>
               <p>
                 <span className="font-semibold">
                   15.1- Trình độ giáo dục phổ thông:
                 </span>{" "}
-                12/12 hệ chính quy
+                {profile.education}
               </p>
               <p>
                 <span className="font-semibold">
                   15.2- Trình độ chuyên môn cao nhất:
                 </span>{" "}
-                Cử nhân xét nghiệm
+                {profile.specialization}
               </p>
               <p>
                 <span className="font-semibold">15.3- Lý luận chính trị:</span>{" "}
+                {profile.politics || ""}
               </p>
               <p>
                 <span className="font-semibold">15.4- Quản lý nhà nước:</span>{" "}
+                {profile.management || ""}
               </p>
               <p>
-                <span className="font-semibold">15.5- Ngoại ngữ:</span> Anh văn
-                B
+                <span className="font-semibold">15.5- Ngoại ngữ:</span>{" "}
+                {profile.language}
               </p>
               <p>
-                <span className="font-semibold">15.6- Tin học:</span> Ứng dụng
-                công nghệ thông tin nâng cao
+                <span className="font-semibold">15.6- Tin học:</span>{" "}
+                {profile.it}
               </p>
               <p>
                 <span className="font-semibold">
                   16) Ngày vào Đảng Cộng sản Việt Nam:
                 </span>{" "}
-                17/12/2016, Ngày chính thức: 17/12/2017
+                {profile.partyJoinDate ? formatDate(profile.partyJoinDate) : ""}
+                , Ngày chính thức:{" "}
+                {profile.partyOfficialDate
+                  ? formatDate(profile.partyOfficialDate)
+                  : ""}
               </p>
               <p>
                 <span className="font-semibold">23) Tình trạng sức khỏe:</span>{" "}
-                Tốt, Chiều cao: 150cm, Cân nặng: 44kg, Nhóm máu: O Rh(+)
+                {profile.health}
               </p>
               <p>
                 <span className="font-semibold">24) Là thương binh hạng:</span>{" "}
-                , Là con gia đình chính sách: Con thương binh hạng 2
+                , Là con gia đình chính sách: {profile.familyPolicy}
               </p>
               <p>
                 <span className="font-semibold">
                   25) Số chứng minh nhân dân:
                 </span>{" "}
-                091183011022, Ngày cấp: 27/01/2023
+                {profile.idNumber}, Ngày cấp: {formatDate(profile.idIssueDate)}
               </p>
             </div>
           </div>

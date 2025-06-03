@@ -10,16 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-interface TrainingHistory {
-  id: string;
-  school: string;
-  major: string;
-  startDate: string;
-  endDate: string;
-  type: string;
-  degree: string;
-}
+import type { TrainingHistory } from "@/types";
 
 interface TrainingFormProps {
   open: boolean;
@@ -135,4 +126,4 @@ export function TrainingForm({
       </DialogContent>
     </Dialog>
   );
-} 
+}

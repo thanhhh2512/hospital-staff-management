@@ -8,16 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Eye, Trash2 } from "lucide-react";
-
-interface Certificate {
-  id: string;
-  name: string;
-  type: string;
-  issueDate: string;
-  issuer: string;
-  description: string;
-  file: string | null;
-}
+import type { Certificate } from "@/types";
 
 interface CertificateCardProps {
   certificate: Certificate;
