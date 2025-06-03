@@ -151,3 +151,4 @@ export interface DocumentView {
   sourceType: "profile" | "certificate" | "vaccination" | "health" | "other";
   sourceId: string;
 }
+ 
