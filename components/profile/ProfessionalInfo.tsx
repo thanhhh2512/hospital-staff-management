@@ -7,8 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useProfileStore } from "@/stores";
 
 export function ProfessionalInfo() {
+  const { profile, updateProfile } = useProfileStore();
+
   return (
     <Card>
       <CardHeader>
@@ -21,90 +24,118 @@ export function ProfessionalInfo() {
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="position">Chức vụ hiện tại</Label>
-            <Input id="position" placeholder="Nhập chức vụ hiện tại" />
+            <Input
+              id="position"
+              value={profile?.position || ""}
+              onChange={(e) => updateProfile({ position: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="department">Phòng/Ban</Label>
             <Input
               id="department"
-              defaultValue="Chuyên khoa xét nghiệm"
+              value={profile?.department || ""}
+              onChange={(e) => updateProfile({ department: e.target.value })}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="jobTitle">
-              Nghề nghiệp khi được tuyển dụng
-            </Label>
+            <Label htmlFor="jobTitle">Nghề nghiệp khi được tuyển dụng</Label>
             <Input
               id="jobTitle"
-              defaultValue="Kỹ thuật viên xét nghiệm đa khoa"
+              value={profile?.jobTitle || ""}
+              onChange={(e) => updateProfile({ jobTitle: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="hireDate">Ngày tuyển dụng</Label>
-            <Input id="hireDate" type="date" defaultValue="2006-08-10" />
+            <Input
+              id="hireDate"
+              type="date"
+              value={profile?.hireDate || ""}
+              onChange={(e) => updateProfile({ hireDate: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="hireAgency">Cơ quan tuyển dụng</Label>
             <Input
               id="hireAgency"
-              defaultValue="BVĐK Trung Ương Cần Thơ"
+              value={profile?.hireAgency || ""}
+              onChange={(e) => updateProfile({ hireAgency: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="rank">Ngạch viên chức</Label>
             <Input
               id="rank"
-              defaultValue="Kỹ thuật y hạng III, Mã ngạch: V.08.07.18"
+              value={profile?.rank || ""}
+              onChange={(e) => updateProfile({ rank: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="salary">Bậc lương</Label>
-            <Input id="salary" defaultValue="5/9, Hệ số: 3.66" />
+            <Input
+              id="salary"
+              value={profile?.salary || ""}
+              onChange={(e) => updateProfile({ salary: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="salaryDate">Ngày hưởng</Label>
             <Input
               id="salaryDate"
               type="date"
-              defaultValue="2022-07-15"
+              value={profile?.salaryDate || ""}
+              onChange={(e) => updateProfile({ salaryDate: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="education">Trình độ giáo dục phổ thông</Label>
-            <Input id="education" defaultValue="12/12 hệ chính quy" />
+            <Input
+              id="education"
+              value={profile?.education || ""}
+              onChange={(e) => updateProfile({ education: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="specialization">
-              Trình độ chuyên môn cao nhất
-            </Label>
+            <Label htmlFor="specialization">Trình độ chuyên môn cao nhất</Label>
             <Input
               id="specialization"
-              defaultValue="Cử nhân xét nghiệm"
+              value={profile?.specialization || ""}
+              onChange={(e) =>
+                updateProfile({ specialization: e.target.value })
+              }
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="politics">Lý luận chính trị</Label>
             <Input
               id="politics"
-              placeholder="Nhập trình độ lý luận chính trị"
+              value={profile?.politics || ""}
+              onChange={(e) => updateProfile({ politics: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="management">Quản lý nhà nước</Label>
             <Input
               id="management"
-              placeholder="Nhập trình độ quản lý nhà nước"
+              value={profile?.management || ""}
+              onChange={(e) => updateProfile({ management: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="language">Ngoại ngữ</Label>
-            <Input id="language" defaultValue="Anh văn B" />
+            <Input
+              id="language"
+              value={profile?.language || ""}
+              onChange={(e) => updateProfile({ language: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="it">Tin học</Label>
             <Input
               id="it"
-              defaultValue="Ứng dụng công nghệ thông tin nâng cao"
+              value={profile?.it || ""}
+              onChange={(e) => updateProfile({ it: e.target.value })}
             />
           </div>
           <div className="space-y-2">
@@ -114,7 +145,8 @@ export function ProfessionalInfo() {
             <Input
               id="partyJoinDate"
               type="date"
-              defaultValue="2016-12-17"
+              value={profile?.partyJoinDate || ""}
+              onChange={(e) => updateProfile({ partyJoinDate: e.target.value })}
             />
           </div>
           <div className="space-y-2">
@@ -122,34 +154,64 @@ export function ProfessionalInfo() {
             <Input
               id="partyOfficialDate"
               type="date"
-              defaultValue="2017-12-17"
+              value={profile?.partyOfficialDate || ""}
+              onChange={(e) =>
+                updateProfile({ partyOfficialDate: e.target.value })
+              }
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="health">Tình trạng sức khỏe</Label>
             <Input
               id="health"
-              defaultValue="Tốt, Chiều cao: 150cm, Cân nặng: 44kg, Nhóm máu: O Rh(+)"
+              value={profile?.health || ""}
+              onChange={(e) => updateProfile({ health: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="familyPolicy">Là thương binh hạng</Label>
             <Input
               id="familyPolicy"
-              placeholder="Nhập thông tin nếu có"
+              value={profile?.familyPolicy || ""}
+              onChange={(e) => updateProfile({ familyPolicy: e.target.value })}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="familyPolicy2">
-              Là con gia đình chính sách
+            <Label htmlFor="highestTitle">
+              Danh hiệu được phong tặng cao nhất
             </Label>
             <Input
-              id="familyPolicy2"
-              defaultValue="Con thương binh hạng 2"
+              id="highestTitle"
+              value={profile?.highestTitle || ""}
+              onChange={(e) => updateProfile({ highestTitle: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="forte">Sở trường công tác</Label>
+            <Input
+              id="forte"
+              value={profile?.forte || ""}
+              onChange={(e) => updateProfile({ forte: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="reward">Khen thưởng</Label>
+            <Input
+              id="reward"
+              value={profile?.reward || ""}
+              onChange={(e) => updateProfile({ reward: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="discipline">Kỷ luật</Label>
+            <Input
+              id="discipline"
+              value={profile?.discipline || ""}
+              onChange={(e) => updateProfile({ discipline: e.target.value })}
             />
           </div>
         </div>
       </CardContent>
     </Card>
   );
-} 
+}

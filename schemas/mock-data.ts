@@ -39,6 +39,15 @@ export const mockProfile: Profile = {
   partyOfficialDate: "2017-12-17",
   health: "Tốt, Chiều cao: 150cm, Cân nặng: 44kg, Nhóm máu: O Rh(+)",
   familyPolicy: "Con thương binh hạng 2",
+  socialOrgJoinDate: "2002-09-01",
+  enlistmentDate: "2003-01-01",
+  dischargeDate: "2005-01-01",
+  highestMilitaryRank: "Trung sĩ",
+  highestTitle: "Chiến sĩ thi đua",
+  forte: "Xét nghiệm lâm sàng",
+  reward: "Bằng khen Bộ Y tế",
+  discipline: "Không",
+  bhxhNumber: "6507003210",
 };
 
 export const mockEmployees: Employee[] = [
@@ -138,8 +147,8 @@ export const mockTrainingHistory: TrainingHistory[] = [
     id: "1",
     school: "Trường ĐHYD.TP Hồ Chí Minh",
     major: "Xét nghiệm",
-    startDate: "11/2009",
-    endDate: "10/2012",
+    startDate: "12/06/2024",
+    endDate: "12/07/2025",
     type: "Liên thông",
     degree: "Cử nhân",
   },

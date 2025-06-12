@@ -118,6 +118,16 @@ export interface Profile {
   partyOfficialDate?: string;
   health: string;
   familyPolicy?: string;
+  // Thông tin bổ sung
+  socialOrgJoinDate?: string; // Ngày tham gia tổ chức chính trị - xã hội
+  enlistmentDate?: string; // Ngày nhập ngũ
+  dischargeDate?: string; // Ngày xuất ngũ
+  highestMilitaryRank?: string; // Quân hàm cao nhất
+  highestTitle?: string; // Danh hiệu được phong tặng cao nhất
+  forte?: string; // Sở trường công tác
+  reward?: string; // Khen thưởng
+  discipline?: string; // Kỷ luật
+  bhxhNumber?: string; // Số sổ BHXH
 }
 
 export interface Document {
@@ -151,4 +161,3 @@ export interface DocumentView {
   sourceType: "profile" | "certificate" | "vaccination" | "health" | "other";
   sourceId: string;
 }
- 

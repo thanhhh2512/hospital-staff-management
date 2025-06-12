@@ -29,7 +29,6 @@ export default function ProfilePage() {
 
   const handleSave = () => {
     setIsSaving(true);
-    // Simulate saving
     setTimeout(() => {
       setIsSaving(false);
       setIsSuccess(true);

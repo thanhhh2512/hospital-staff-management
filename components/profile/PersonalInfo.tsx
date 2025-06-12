@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChangeEvent, RefObject } from "react";
+import { useProfileStore } from "@/stores";
 
 interface PersonalInfoProps {
   avatarSrc: string | null;
@@ -30,6 +31,8 @@ export function PersonalInfo({
   fileInputRef,
   handleAvatarUpload,
 }: PersonalInfoProps) {
+  const { profile, updateProfile } = useProfileStore();
+
   return (
     <Card>
       <CardHeader>
@@ -64,11 +67,18 @@ export function PersonalInfo({
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="fullName">Họ và tên</Label>
-            <Input id="fullName" defaultValue="Lê Thị Mức" />
+            <Input
+              id="fullName"
+              value={profile?.fullName || ""}
+              onChange={(e) => updateProfile({ fullName: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="gender">Giới tính</Label>
-            <Select defaultValue="female">
+            <Select
+              value={profile?.gender || ""}
+              onValueChange={(value) => updateProfile({ gender: value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Chọn giới tính" />
               </SelectTrigger>
@@ -81,45 +91,78 @@ export function PersonalInfo({
           </div>
           <div className="space-y-2">
             <Label htmlFor="dob">Ngày sinh</Label>
-            <Input id="dob" type="date" defaultValue="1983-03-11" />
+            <Input
+              id="dob"
+              type="date"
+              value={profile?.dob || ""}
+              onChange={(e) => updateProfile({ dob: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="birthPlace">Nơi sinh</Label>
             <Input
               id="birthPlace"
-              defaultValue="Ấp Đông Giữa, Xã Nam Thái, Huyện An Biên, Tỉnh Kiên Giang"
+              value={profile?.birthPlace || ""}
+              onChange={(e) => updateProfile({ birthPlace: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="hometown">Quê quán</Label>
             <Input
               id="hometown"
-              defaultValue="Ấp Đông Giữa, Xã Nam Thái, Huyện An Biên, Tỉnh Kiên Giang"
+              value={profile?.hometown || ""}
+              onChange={(e) => updateProfile({ hometown: e.target.value })}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="ethnicity">Dân tộc</Label>
-            <Input id="ethnicity" defaultValue="Kinh" />
+            <Input
+              id="ethnicity"
+              value={profile?.ethnicity || ""}
+              onChange={(e) => updateProfile({ ethnicity: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="religion">Tôn giáo</Label>
-            <Input id="religion" defaultValue="Không" />
+            <Input
+              id="religion"
+              value={profile?.religion || ""}
+              onChange={(e) => updateProfile({ religion: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="idNumber">Số CMND/CCCD</Label>
-            <Input id="idNumber" defaultValue="091183011022" />
+            <Input
+              id="idNumber"
+              value={profile?.idNumber || ""}
+              onChange={(e) => updateProfile({ idNumber: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="idIssueDate">Ngày cấp</Label>
-            <Input id="idIssueDate" type="date" defaultValue="2023-01-27" />
+            <Input
+              id="idIssueDate"
+              type="date"
+              value={profile?.idIssueDate || ""}
+              onChange={(e) => updateProfile({ idIssueDate: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Số điện thoại</Label>
-            <Input id="phone" defaultValue="0919.474.649" />
+            <Input
+              id="phone"
+              value={profile?.phone || ""}
+              onChange={(e) => updateProfile({ phone: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" defaultValue="muchau99@gmail.com" />
+            <Input
+              id="email"
+              type="email"
+              value={profile?.email || ""}
+              onChange={(e) => updateProfile({ email: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="permanentAddress">
@@ -127,14 +170,72 @@ export function PersonalInfo({
             </Label>
             <Input
               id="permanentAddress"
-              defaultValue="Ấp Đông Giữa, Xã Nam Thái, Huyện An Biên, Tỉnh Kiên Giang"
+              value={profile?.permanentAddress || ""}
+              onChange={(e) =>
+                updateProfile({ permanentAddress: e.target.value })
+              }
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="currentAddress">Nơi ở hiện nay</Label>
             <Input
               id="currentAddress"
-              defaultValue="Số 204 Trần Việt Châu Phường An Hòa Quận Ninh Kiều TP. Cần Thơ"
+              value={profile?.currentAddress || ""}
+              onChange={(e) =>
+                updateProfile({ currentAddress: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="socialOrgJoinDate">
+              Ngày tham gia tổ chức chính trị - xã hội
+            </Label>
+            <Input
+              id="socialOrgJoinDate"
+              type="date"
+              value={profile?.socialOrgJoinDate || ""}
+              onChange={(e) =>
+                updateProfile({ socialOrgJoinDate: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="enlistmentDate">Ngày nhập ngũ</Label>
+            <Input
+              id="enlistmentDate"
+              type="date"
+              value={profile?.enlistmentDate || ""}
+              onChange={(e) =>
+                updateProfile({ enlistmentDate: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="dischargeDate">Ngày xuất ngũ</Label>
+            <Input
+              id="dischargeDate"
+              type="date"
+              value={profile?.dischargeDate || ""}
+              onChange={(e) => updateProfile({ dischargeDate: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="highestMilitaryRank">Quân hàm cao nhất</Label>
+            <Input
+              id="highestMilitaryRank"
+              placeholder="Nhập quân hàm cao nhất"
+              value={profile?.highestMilitaryRank || ""}
+              onChange={(e) =>
+                updateProfile({ highestMilitaryRank: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="bhxhNumber">Số sổ BHXH</Label>
+            <Input
+              id="bhxhNumber"
+              value={profile?.bhxhNumber || ""}
+              onChange={(e) => updateProfile({ bhxhNumber: e.target.value })}
             />
           </div>
         </div>

@@ -1,14 +1,5 @@
 import { CertificateCard } from "./CertificateCard";
-
-interface Certificate {
-  id: string;
-  name: string;
-  type: string;
-  issueDate: string;
-  issuer: string;
-  description: string;
-  file: string | null;
-}
+import type { Certificate } from "@/types";
 
 interface CertificateListProps {
   certificates: Certificate[];
@@ -33,4 +24,4 @@ export function CertificateList({
       ))}
     </div>
   );
-} 
+}

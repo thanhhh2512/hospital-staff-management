@@ -2,7 +2,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 // Register fonts
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts.vfs;
 
 /**
  * Generate PDF using pdfmake library (alternative to jspdf)
@@ -199,7 +199,7 @@ export const generatePDFWithPdfMake = async (
     };
 
     // Generate PDF
-    pdfMake.createPdf(docDefinition).download("ho-so-ca-nhan.pdf");
+    pdfMake.createPdf(docDefinition as any).download("ho-so-ca-nhan.pdf");
   } catch (err) {
     console.error("Lỗi xuất PDF:", err);
   }

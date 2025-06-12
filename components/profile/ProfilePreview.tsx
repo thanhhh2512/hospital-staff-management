@@ -3,9 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { generateProfilePDF } from "./pdfUtils";
 import { useProfileStore } from "@/stores";
+import { useTrainingStore } from "@/stores";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { FileDown } from 'lucide-react';
+import { FileDown } from "lucide-react";
 
 interface ProfilePreviewProps {
   profileRef: RefObject<HTMLDivElement | null>;
@@ -14,6 +15,7 @@ interface ProfilePreviewProps {
 
 export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
   const { profile } = useProfileStore();
+  const { trainings } = useTrainingStore();
 
   const handleExportPDF = () => {
     if (profileRef.current) {
@@ -41,6 +43,12 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
     }
   };
 
+  const isValidDate = (dateStr: string) => {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    return !isNaN(d.getTime());
+  };
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -51,7 +59,9 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
             size="sm"
             className="flex items-center gap-2"
           >
-            <span className="material-icons text-sm"><FileDown /></span>
+            <span className="material-icons text-sm">
+              <FileDown />
+            </span>
             Xuất PDF
           </Button>
         </div>
@@ -149,7 +159,7 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
                 {profile.rank}
               </p>
               <p>
-                <span className="font-semibold">15) Bậc lương:</span>{" "}
+                <span className="font-semibold">Bậc lương:</span>{" "}
                 {profile.salary}, Ngày hưởng: {formatDate(profile.salaryDate)}
               </p>
               <p>
@@ -167,9 +177,9 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
               <p>
                 <span className="font-semibold">15.3- Lý luận chính trị:</span>{" "}
                 {profile.politics || ""}
-              </p>
-              <p>
-                <span className="font-semibold">15.4- Quản lý nhà nước:</span>{" "}
+                <span className="font-semibold ms-4">
+                  15.4- Quản lý nhà nước:
+                </span>{" "}
                 {profile.management || ""}
               </p>
               <p>
@@ -191,6 +201,40 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
                   : ""}
               </p>
               <p>
+                <span className="font-semibold">
+                  17) Ngày tham gia tổ chức chính trị - xã hội:
+                </span>{" "}
+                {profile.socialOrgJoinDate
+                  ? formatDate(profile.socialOrgJoinDate)
+                  : ""}
+              </p>
+              <p>
+                <span className="font-semibold">18) Ngày nhập ngũ:</span>{" "}
+                {profile.enlistmentDate
+                  ? formatDate(profile.enlistmentDate)
+                  : ""}{" "}
+                <span className="font-semibold ms-4">Ngày xuất ngũ:</span>{" "}
+                {profile.dischargeDate ? formatDate(profile.dischargeDate) : ""}{" "}
+                <span className="font-semibold ms-4">Quân hàm cao nhất:</span>{" "}
+                {profile.highestMilitaryRank || ""}
+              </p>
+              <p>
+                <span className="font-semibold">
+                  19) Danh hiệu được phong tặng cao nhất:
+                </span>{" "}
+                {profile.highestTitle || ""}
+              </p>
+              <p>
+                <span className="font-semibold">20) Sở trường công tác:</span>{" "}
+                {profile.forte || ""}
+              </p>
+              <p>
+                <span className="font-semibold">21) Khen thưởng:</span>{" "}
+                {profile.reward || ""}{" "}
+                <span className="font-semibold ms-6">22) Kỷ luật:</span>{" "}
+                {profile.discipline || ""}
+              </p>
+              <p>
                 <span className="font-semibold">23) Tình trạng sức khỏe:</span>{" "}
                 {profile.health}
               </p>
@@ -204,14 +248,17 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
                 </span>{" "}
                 {profile.idNumber}, Ngày cấp: {formatDate(profile.idIssueDate)}
               </p>
+              <p>
+                <span className="font-semibold">26) Số sổ BHXH:</span>{" "}
+                {profile.bhxhNumber || ""}
+              </p>
             </div>
           </div>
-
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold">
+          <div className="my-2">
+            <span className="font-semibold">
               27) Đào tạo, bồi dưỡng về chuyên môn, nghiệp vụ, lý luận chính
               trị, ngoại ngữ, tin học
-            </h3>
+            </span>
             <div className="rounded-md border">
               <table className="w-full caption-bottom text-sm">
                 <thead className="border-b">
@@ -234,24 +281,49 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b transition-colors hover:bg-muted/50">
-                    <td className="p-4 align-middle">
-                      Trường ĐHYD.TP Hồ Chí Minh
-                    </td>
-                    <td className="p-4 align-middle">Xét nghiệm</td>
-                    <td className="p-4 align-middle">11/2009 - 10/2012</td>
-                    <td className="p-4 align-middle">Liên thông</td>
-                    <td className="p-4 align-middle">Cử nhân</td>
-                  </tr>
+                  {trainings.length > 0 ? (
+                    trainings.map((training) => (
+                      <tr
+                        key={training.id}
+                        className="border-b transition-colors hover:bg-muted/50"
+                      >
+                        <td className="p-4 align-middle">{training.school}</td>
+                        <td className="p-4 align-middle">{training.major}</td>
+                        <td className="p-4 align-middle">
+                          {isValidDate(training.startDate) &&
+                          isValidDate(training.endDate)
+                            ? `${format(
+                                new Date(training.startDate),
+                                "dd/MM/yyyy"
+                              )} - ${format(
+                                new Date(training.endDate),
+                                "dd/MM/yyyy"
+                              )}`
+                            : ""}
+                        </td>
+                        <td className="p-4 align-middle">{training.type}</td>
+                        <td className="p-4 align-middle">{training.degree}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="p-4 text-center text-muted-foreground"
+                      >
+                        Chưa có thông tin đào tạo
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
-
+          {/* 
           <div className="mt-8 border-t pt-4 text-right">
             <p>Phiên bản: 1.0</p>
             <p>Trang: 1/2</p>
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>

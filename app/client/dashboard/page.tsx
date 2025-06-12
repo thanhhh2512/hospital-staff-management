@@ -1,6 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Award, Briefcase, FileText, Syringe, User } from "lucide-react"
-import Link from "next/link"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Award, Briefcase, FileText, Syringe, User } from "lucide-react";
+import Link from "next/link";
 
 export default function ClientDashboard() {
   const cards = [
@@ -28,19 +34,15 @@ export default function ClientDashboard() {
       icon: Syringe,
       href: "/client/vaccination",
     },
-    {
-      title: "Hồ sơ nhân sự",
-      description: "Quản lý các tài liệu hồ sơ nhân sự",
-      icon: FileText,
-      href: "/client/documents",
-    },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Trang chủ</h1>
-        <p className="text-muted-foreground">Chào mừng đến với hệ thống quản lý nhân viên bệnh viện</p>
+        <p className="text-muted-foreground">
+          Chào mừng đến với hệ thống quản lý nhân viên bệnh viện
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -48,7 +50,9 @@ export default function ClientDashboard() {
           <Link key={card.href} href={card.href}>
             <Card className="h-full transition-colors hover:bg-muted/50">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg font-medium">{card.title}</CardTitle>
+                <CardTitle className="text-lg font-medium">
+                  {card.title}
+                </CardTitle>
                 <card.icon className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -59,5 +63,5 @@ export default function ClientDashboard() {
         ))}
       </div>
     </div>
-  )
+  );
 }

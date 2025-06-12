@@ -37,47 +37,14 @@ import {
   Certificate,
   Vaccination,
   VaccinationFormData,
-} from "@/components/vaccination/types";
+} from "@/types";
+import {mockCertificates, mockVaccinations} from "@/schemas/mock-data";
 
 export default function VaccinationPage() {
   const { toast } = useToast();
-  const [vaccinations, setVaccinations] = useState<Vaccination[]>([
-    {
-      id: "1",
-      name: "Vắc-xin COVID-19 (Pfizer)",
-      date: "2021-08-15",
-      location: "Trung tâm Y tế Quận Ninh Kiều",
-      notes: "Mũi 1",
-      file: null,
-      nextDose: "2021-09-05",
-    },
-    {
-      id: "2",
-      name: "Vắc-xin COVID-19 (Pfizer)",
-      date: "2021-09-05",
-      location: "Trung tâm Y tế Quận Ninh Kiều",
-      notes: "Mũi 2",
-      file: null,
-    },
-  ]);
+  const [vaccinations, setVaccinations] = useState<Vaccination[]>(mockVaccinations);
 
-  const [certificates, setCertificates] = useState<Certificate[]>([
-    {
-      id: "1",
-      name: "Chứng nhận tiêm chủng COVID-19",
-      issueDate: "2021-09-15",
-      issuer: "Sở Y tế Thành phố Cần Thơ",
-      file: null,
-    },
-    {
-      id: "2",
-      name: "Chứng nhận tiêm phòng Viêm gan B",
-      issueDate: "2020-03-10",
-      expiryDate: "2030-03-10",
-      issuer: "Bệnh viện Đa khoa Thành phố Cần Thơ",
-      file: null,
-    },
-  ]);
+  const [certificates, setCertificates] = useState<Certificate[]>(mockCertificates);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -98,15 +65,12 @@ export default function VaccinationPage() {
     try {
       let fileUrl: string | null = null;
       if (file) {
-        // In a real app, upload the file to a server and get the URL
         const reader = new FileReader();
         fileUrl = await new Promise((resolve) => {
           reader.onload = () => resolve(reader.result as string);
           reader.readAsDataURL(file);
         });
       }
-
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const newVaccination: Vaccination = {
@@ -144,7 +108,6 @@ export default function VaccinationPage() {
     setIsDeleting(true);
 
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setVaccinations((prev) =>

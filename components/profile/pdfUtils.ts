@@ -266,10 +266,10 @@ export const generateProfilePDF = async (
     }
 
     const trainingTitle =
-      profileRef.querySelector(".space-y-4 h3")?.textContent ??
+      profileRef.querySelector(".my-2 span")?.textContent ??
       "Đào tạo, bồi dưỡng";
 
-    pdf.setFontSize(fontSize.heading);
+    pdf.setFontSize(fontSize.normal);
     yPosition += 10;
     pdf.text(trainingTitle, margin.left, yPosition);
     yPosition += 10;
@@ -306,8 +306,8 @@ export const generateProfilePDF = async (
         });
       }
     }
-
     pdf.save("ly-lich-ca-nhan.pdf");
+
   } catch (error) {
     console.error("Lỗi khi tạo PDF:", error);
   }
