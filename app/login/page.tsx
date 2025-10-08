@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -20,25 +20,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useAuthStore } from "@/stores";
+import { toast } from "sonner";
 
-// Zod schema
+// Zod schema for login
 const formSchema = z.object({
-  email: z.string().email("Email không hợp lệ"),
-  password: z
+  employeeId: z
     .string()
-    .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
-    .regex(/[a-z]/, "Phải có ít nhất một chữ thường")
-    .regex(/[A-Z]/, "Phải có ít nhất một chữ hoa")
-    .regex(/[0-9]/, "Phải có ít nhất một chữ số")
-    .regex(/[^a-zA-Z0-9]/, "Phải có ít nhất một ký tự đặc biệt"),
+    .min(1, "Mã nhân viên không được để trống")
+    .min(3, "Mã nhân viên phải có ít nhất 3 ký tự"),
+  password: z.string().min(1, "Mật khẩu không được để trống"),
 });
 
 type LoginFormData = z.infer<typeof formSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const { login, isLoading, error, clearError, user, isAuthenticated } =
+    useAuthStore();
 
   const {
     register,
@@ -48,17 +50,71 @@ export default function LoginPage() {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
+  // Clear errors when component mounts
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      if (data.email === "admin@gmail.com" && data.password === "Admin_123") {
-        router.push("/admin/dashboard");
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const redirectPath =
+        user.role === "admin" ? "/admin/dashboard" : "/client/dashboard";
+      router.push(redirectPath);
+    }
+  }, [isAuthenticated, user, router]);
+
+  // Clear errors when user starts typing
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        clearError();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clearError]);
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      console.log("Attempting login with:", { employeeId: data.employeeId }); // Don't log password
+
+      const success = await login(data.employeeId, data.password);
+
+      if (success) {
+        // Get the updated user from the store after successful login
+        const currentUser = useAuthStore.getState().user;
+
+        if (currentUser) {
+          // Redirect based on user role
+          const redirectPath =
+            currentUser.role === "admin"
+              ? "/admin/dashboard"
+              : "/client/dashboard";
+
+          toast.success(
+            `Đăng nhập thành công! Chào mừng ${
+              currentUser.role === "admin" ? "Quản trị viên" : "Người dùng"
+            }!`
+          );
+
+          // Small delay to ensure toast is shown before redirect
+          setTimeout(() => {
+            router.push(redirectPath);
+          }, 500);
+        } else {
+          console.error("Login successful but no user data available");
+          toast.error(
+            "Đăng nhập thành công nhưng không thể lấy thông tin người dùng"
+          );
+        }
       } else {
-        router.push("/client/dashboard");
+        console.log("Login failed - check auth store error");
+        // Error is already handled by the store and displayed via toast
       }
-    }, 1500);
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("Đã xảy ra lỗi trong quá trình đăng nhập");
+    }
   };
 
   return (
@@ -76,16 +132,25 @@ export default function LoginPage() {
           </CardHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
+              {error && (
+                <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                  {error}
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="employeeId">Mã nhân viên</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@hospital.com"
-                  {...register("email")}
+                  id="employeeId"
+                  type="text"
+                  placeholder="Nhập mã nhân viên"
+                  {...register("employeeId")}
+                  disabled={isLoading}
                 />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                {errors.employeeId && (
+                  <p className="text-sm text-red-500">
+                    {errors.employeeId.message}
+                  </p>
                 )}
               </div>
 
@@ -105,6 +170,7 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Nhập mật khẩu"
                     {...register("password")}
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -131,7 +197,12 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center space-x-2">
-                <Checkbox id="remember" />
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  disabled={isLoading}
+                />
                 <Label htmlFor="remember" className="text-sm">
                   Lưu thông tin đăng nhập
                 </Label>
@@ -148,15 +219,6 @@ export default function LoginPage() {
                   "Đăng nhập"
                 )}
               </Button>
-              <div className="text-center text-sm">
-                Chưa có tài khoản?{" "}
-                <Link
-                  href="/register"
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  Đăng ký
-                </Link>
-              </div>
             </CardFooter>
           </form>
         </Card>

@@ -1,3 +1,4 @@
+export * from "./use-auth-store";
 export * from "./use-profile-store";
 export * from "./use-employee-store";
 export * from "./use-certificate-store";

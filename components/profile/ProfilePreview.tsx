@@ -1,21 +1,39 @@
-import { RefObject, useRef } from "react";
+import { useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { generateProfilePDF } from "./pdfUtils";
 import { useProfileStore } from "@/stores";
 import { useTrainingStore } from "@/stores";
+import { useFormContext } from "react-hook-form";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { FileDown } from "lucide-react";
+import type { Profile } from "@/types";
+import type { ProfileFormData } from "@/lib/profileFormSchema";
 
 interface ProfilePreviewProps {
-  profileRef: RefObject<HTMLDivElement | null>;
   avatarSrc: string | null;
 }
 
-export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
-  const { profile } = useProfileStore();
+export function ProfilePreview({ avatarSrc }: ProfilePreviewProps) {
+  const { profile: storeProfile } = useProfileStore();
   const { trainings } = useTrainingStore();
+  const { watch } = useFormContext<ProfileFormData>();
+
+  // Watch all form values for real-time preview
+  const formValues = watch();
+
+  // Merge store profile with current form values for preview
+  const previewData: Profile = {
+    ...storeProfile!,
+    ...formValues,
+    avatar: storeProfile?.avatar || null, // Keep original avatar unless changed
+  };
+
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Use preview data if available, otherwise fallback to store profile
+  const profile = previewData || storeProfile;
 
   const handleExportPDF = () => {
     if (profileRef.current) {
@@ -184,7 +202,7 @@ export function ProfilePreview({ profileRef, avatarSrc }: ProfilePreviewProps) {
               </p>
               <p>
                 <span className="font-semibold">15.5- Ngoại ngữ:</span>{" "}
-                {profile.language}
+                {profile.languageLevel}
               </p>
               <p>
                 <span className="font-semibold">15.6- Tin học:</span>{" "}

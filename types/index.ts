@@ -112,7 +112,7 @@ export interface Profile {
   specialization: string;
   politics?: string;
   management?: string;
-  language: string;
+  languageLevel: string;
   it: string;
   partyJoinDate?: string;
   partyOfficialDate?: string;
@@ -146,12 +146,12 @@ export interface DocumentView {
   id: string;
   title: string;
   category:
-    | "personal"
-    | "degree"
-    | "certificate"
-    | "vaccination"
-    | "health"
-    | "other";
+  | "personal"
+  | "degree"
+  | "certificate"
+  | "vaccination"
+  | "health"
+  | "other";
   employeeName: string;
   employeeId: string;
   uploadDate: string;

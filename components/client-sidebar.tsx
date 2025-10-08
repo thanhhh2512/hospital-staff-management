@@ -8,7 +8,6 @@ import { ModeToggle } from "@/components/mode-toggle"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 
-// Định nghĩa kiểu dữ liệu cho trường tùy chỉnh
 interface CustomField {
   id: string
   name: string
@@ -48,7 +47,6 @@ export function ClientSidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const [customFields, setCustomFields] = useState<CustomField[]>([])
 
-  // Lấy danh sách trường tùy chỉnh từ localStorage khi component được mount
   useEffect(() => {
     const storedFields = localStorage.getItem("customFields")
     if (storedFields) {

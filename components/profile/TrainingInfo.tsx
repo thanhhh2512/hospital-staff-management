@@ -7,25 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useTrainingStore } from "@/stores";
-import type { TrainingHistory } from "@/types";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormContext } from "react-hook-form";
 import { format } from "date-fns";
-
-const trainingSchema = z.object({
-  school: z.string().min(1, "Tên trường không được để trống"),
-  major: z.string().min(1, "Chuyên ngành không được để trống"),
-  startDate: z.string().min(1, "Bắt buộc"),
-  endDate: z.string().min(1, "Bắt buộc"),
-  type: z.string().min(1, "Hình thức đào tạo không được để trống"),
-  degree: z.string().min(1, "Văn bằng, chứng chỉ không được để trống"),
-});
-
-type TrainingForm = z.infer<typeof trainingSchema>;
+import type { ProfileFormData, TrainingHistory } from "@/lib/profileFormSchema";
 
 const isValidDate = (dateStr: string) => {
   if (!dateStr) return false;
@@ -33,30 +19,79 @@ const isValidDate = (dateStr: string) => {
   return !isNaN(d.getTime());
 };
 
-export function TrainingInfo() {
-  const { trainings, addTraining } = useTrainingStore();
+interface TrainingInfoProps {
+  isReadOnly?: boolean;
+}
+
+export function TrainingInfo({ isReadOnly = false }: TrainingInfoProps) {
+  const { watch, setValue } = useFormContext<ProfileFormData>();
   const [showForm, setShowForm] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<TrainingForm>({
-    resolver: zodResolver(trainingSchema),
-    defaultValues: {
+  const [formData, setFormData] = useState<Omit<TrainingHistory, "id">>({
+    school: "",
+    major: "",
+    startDate: "",
+    endDate: "",
+    type: "",
+    degree: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Watch trainings from the main form
+  const trainings = watch("trainings") || [];
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.school.trim())
+      newErrors.school = "Tên trường không được để trống";
+    if (!formData.major.trim())
+      newErrors.major = "Chuyên ngành không được để trống";
+    if (!formData.startDate) newErrors.startDate = "Bắt buộc";
+    if (!formData.endDate) newErrors.endDate = "Bắt buộc";
+    if (!formData.type.trim())
+      newErrors.type = "Hình thức đào tạo không được để trống";
+    if (!formData.degree.trim())
+      newErrors.degree = "Văn bằng, chứng chỉ không được để trống";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    // Add new training to the main form
+    const newTraining: TrainingHistory = {
+      id: uuidv4(),
+      ...formData,
+    };
+
+    setValue("trainings", [...trainings, newTraining]);
+
+    // Reset form
+    setFormData({
       school: "",
       major: "",
       startDate: "",
       endDate: "",
       type: "",
       degree: "",
-    },
-  });
-
-  const onSubmit = (data: TrainingForm) => {
-    addTraining({ id: uuidv4(), ...data });
-    reset();
+    });
+    setErrors({});
     setShowForm(false);
+  };
+
+  const handleInputChange = (
+    field: keyof Omit<TrainingHistory, "id">,
+    value: string
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
   };
 
   return (
@@ -131,31 +166,33 @@ export function TrainingInfo() {
           {showForm ? (
             <form
               className="space-y-2 border p-4 rounded-md bg-muted/30"
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={handleSubmit}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                   <input
                     className="border p-2 rounded w-full"
                     placeholder="Tên trường"
-                    {...register("school")}
+                    value={formData.school}
+                    onChange={(e) =>
+                      handleInputChange("school", e.target.value)
+                    }
+                    disabled={isReadOnly}
                   />
                   {errors.school && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.school.message}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.school}</p>
                   )}
                 </div>
                 <div>
                   <input
                     className="border p-2 rounded w-full"
                     placeholder="Chuyên ngành"
-                    {...register("major")}
+                    value={formData.major}
+                    onChange={(e) => handleInputChange("major", e.target.value)}
+                    disabled={isReadOnly}
                   />
                   {errors.major && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.major.message}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.major}</p>
                   )}
                 </div>
                 <div>
@@ -163,11 +200,15 @@ export function TrainingInfo() {
                     className="border p-2 rounded w-full"
                     type="date"
                     placeholder="Từ ngày"
-                    {...register("startDate")}
+                    value={formData.startDate}
+                    onChange={(e) =>
+                      handleInputChange("startDate", e.target.value)
+                    }
+                    disabled={isReadOnly}
                   />
                   {errors.startDate && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.startDate.message}
+                      {errors.startDate}
                     </p>
                   )}
                 </div>
@@ -176,11 +217,15 @@ export function TrainingInfo() {
                     className="border p-2 rounded w-full"
                     type="date"
                     placeholder="Đến ngày"
-                    {...register("endDate")}
+                    value={formData.endDate}
+                    onChange={(e) =>
+                      handleInputChange("endDate", e.target.value)
+                    }
+                    disabled={isReadOnly}
                   />
                   {errors.endDate && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.endDate.message}
+                      {errors.endDate}
                     </p>
                   )}
                 </div>
@@ -188,29 +233,31 @@ export function TrainingInfo() {
                   <input
                     className="border p-2 rounded w-full"
                     placeholder="Hình thức đào tạo"
-                    {...register("type")}
+                    value={formData.type}
+                    onChange={(e) => handleInputChange("type", e.target.value)}
+                    disabled={isReadOnly}
                   />
                   {errors.type && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.type.message}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.type}</p>
                   )}
                 </div>
                 <div>
                   <input
                     className="border p-2 rounded w-full"
                     placeholder="Văn bằng, chứng chỉ"
-                    {...register("degree")}
+                    value={formData.degree}
+                    onChange={(e) =>
+                      handleInputChange("degree", e.target.value)
+                    }
+                    disabled={isReadOnly}
                   />
                   {errors.degree && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.degree.message}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.degree}</p>
                   )}
                 </div>
               </div>
               <div className="flex gap-2 mt-2">
-                <Button size="sm" type="submit">
+                <Button size="sm" type="submit" disabled={isReadOnly}>
                   Lưu
                 </Button>
                 <Button
@@ -219,8 +266,17 @@ export function TrainingInfo() {
                   type="button"
                   onClick={() => {
                     setShowForm(false);
-                    reset();
+                    setFormData({
+                      school: "",
+                      major: "",
+                      startDate: "",
+                      endDate: "",
+                      type: "",
+                      degree: "",
+                    });
+                    setErrors({});
                   }}
+                  disabled={isReadOnly}
                 >
                   Hủy
                 </Button>
@@ -231,6 +287,7 @@ export function TrainingInfo() {
               variant="outline"
               className="w-full"
               onClick={() => setShowForm(true)}
+              disabled={isReadOnly}
             >
               <Upload className="mr-2 h-4 w-4" />
               Thêm quá trình đào tạo

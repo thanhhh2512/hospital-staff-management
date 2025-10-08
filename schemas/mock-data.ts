@@ -33,7 +33,7 @@ export const mockProfile: Profile = {
   salaryDate: "2022-07-15",
   education: "12/12 hệ chính quy",
   specialization: "Cử nhân xét nghiệm",
-  language: "Anh văn B",
+  languageLevel: "Anh văn B",
   it: "Ứng dụng công nghệ thông tin nâng cao",
   partyJoinDate: "2016-12-17",
   partyOfficialDate: "2017-12-17",

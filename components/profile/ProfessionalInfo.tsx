@@ -7,10 +7,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useProfileStore } from "@/stores";
+import { useFormContext } from "react-hook-form";
+import type { ProfileFormData } from "@/lib/profileFormSchema";
 
-export function ProfessionalInfo() {
-  const { profile, updateProfile } = useProfileStore();
+interface ProfessionalInfoProps {
+  isReadOnly?: boolean;
+}
+
+export function ProfessionalInfo({
+  isReadOnly = false,
+}: ProfessionalInfoProps) {
+  const { register } = useFormContext<ProfileFormData>();
 
   return (
     <Card>
@@ -26,188 +33,225 @@ export function ProfessionalInfo() {
             <Label htmlFor="position">Chức vụ hiện tại</Label>
             <Input
               id="position"
-              value={profile?.position || ""}
-              onChange={(e) => updateProfile({ position: e.target.value })}
+              {...register("position")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="department">Phòng/Ban</Label>
+            <Label htmlFor="department">Phòng ban</Label>
             <Input
               id="department"
-              value={profile?.department || ""}
-              onChange={(e) => updateProfile({ department: e.target.value })}
+              {...register("department")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="jobTitle">Nghề nghiệp khi được tuyển dụng</Label>
+            <Label htmlFor="jobTitle">Chức danh nghề nghiệp</Label>
             <Input
               id="jobTitle"
-              value={profile?.jobTitle || ""}
-              onChange={(e) => updateProfile({ jobTitle: e.target.value })}
+              {...register("jobTitle")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="hireDate">Ngày tuyển dụng</Label>
             <Input
               id="hireDate"
               type="date"
-              value={profile?.hireDate || ""}
-              onChange={(e) => updateProfile({ hireDate: e.target.value })}
+              {...register("hireDate")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="hireAgency">Cơ quan tuyển dụng</Label>
             <Input
               id="hireAgency"
-              value={profile?.hireAgency || ""}
-              onChange={(e) => updateProfile({ hireAgency: e.target.value })}
+              {...register("hireAgency")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="rank">Ngạch viên chức</Label>
-            <Input
-              id="rank"
-              value={profile?.rank || ""}
-              onChange={(e) => updateProfile({ rank: e.target.value })}
-            />
+            <Label htmlFor="rank">Bậc lương</Label>
+            <Input id="rank" {...register("rank")} disabled={isReadOnly} />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="salary">Bậc lương</Label>
-            <Input
-              id="salary"
-              value={profile?.salary || ""}
-              onChange={(e) => updateProfile({ salary: e.target.value })}
-            />
+            <Label htmlFor="salary">Mức lương</Label>
+            <Input id="salary" {...register("salary")} disabled={isReadOnly} />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="salaryDate">Ngày hưởng</Label>
+            <Label htmlFor="salaryDate">Ngày hưởng lương</Label>
             <Input
               id="salaryDate"
               type="date"
-              value={profile?.salaryDate || ""}
-              onChange={(e) => updateProfile({ salaryDate: e.target.value })}
+              {...register("salaryDate")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="education">Trình độ giáo dục phổ thông</Label>
+            <Label htmlFor="education">Trình độ học vấn</Label>
             <Input
               id="education"
-              value={profile?.education || ""}
-              onChange={(e) => updateProfile({ education: e.target.value })}
+              {...register("education")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="specialization">Trình độ chuyên môn cao nhất</Label>
+            <Label htmlFor="specialization">Chuyên môn</Label>
             <Input
               id="specialization"
-              value={profile?.specialization || ""}
-              onChange={(e) =>
-                updateProfile({ specialization: e.target.value })
-              }
+              {...register("specialization")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="politics">Lý luận chính trị</Label>
             <Input
               id="politics"
-              value={profile?.politics || ""}
-              onChange={(e) => updateProfile({ politics: e.target.value })}
+              {...register("politics")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="management">Quản lý nhà nước</Label>
             <Input
               id="management"
-              value={profile?.management || ""}
-              onChange={(e) => updateProfile({ management: e.target.value })}
+              {...register("management")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="language">Ngoại ngữ</Label>
+            <Label htmlFor="languageLevel">Ngoại ngữ</Label>
             <Input
-              id="language"
-              value={profile?.language || ""}
-              onChange={(e) => updateProfile({ language: e.target.value })}
+              id="languageLevel"
+              {...register("languageLevel")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="it">Tin học</Label>
-            <Input
-              id="it"
-              value={profile?.it || ""}
-              onChange={(e) => updateProfile({ it: e.target.value })}
-            />
+            <Input id="it" {...register("it")} disabled={isReadOnly} />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="partyJoinDate">
-              Ngày vào Đảng Cộng sản Việt Nam
-            </Label>
+            <Label htmlFor="partyJoinDate">Ngày vào Đảng</Label>
             <Input
               id="partyJoinDate"
               type="date"
-              value={profile?.partyJoinDate || ""}
-              onChange={(e) => updateProfile({ partyJoinDate: e.target.value })}
+              {...register("partyJoinDate")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="partyOfficialDate">Ngày chính thức</Label>
             <Input
               id="partyOfficialDate"
               type="date"
-              value={profile?.partyOfficialDate || ""}
-              onChange={(e) =>
-                updateProfile({ partyOfficialDate: e.target.value })
-              }
+              {...register("partyOfficialDate")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="health">Tình trạng sức khỏe</Label>
-            <Input
-              id="health"
-              value={profile?.health || ""}
-              onChange={(e) => updateProfile({ health: e.target.value })}
-            />
+            <Label htmlFor="health">Sức khỏe</Label>
+            <Input id="health" {...register("health")} disabled={isReadOnly} />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="familyPolicy">Là thương binh hạng</Label>
+            <Label htmlFor="familyPolicy">Chính sách gia đình</Label>
             <Input
               id="familyPolicy"
-              value={profile?.familyPolicy || ""}
-              onChange={(e) => updateProfile({ familyPolicy: e.target.value })}
+              {...register("familyPolicy")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="highestTitle">
-              Danh hiệu được phong tặng cao nhất
-            </Label>
+            <Label htmlFor="socialOrgJoinDate">Ngày vào tổ chức XH-CT</Label>
+            <Input
+              id="socialOrgJoinDate"
+              type="date"
+              {...register("socialOrgJoinDate")}
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="enlistmentDate">Ngày nhập ngũ</Label>
+            <Input
+              id="enlistmentDate"
+              type="date"
+              {...register("enlistmentDate")}
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dischargeDate">Ngày xuất ngũ</Label>
+            <Input
+              id="dischargeDate"
+              type="date"
+              {...register("dischargeDate")}
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="highestMilitaryRank">Cấp bậc cao nhất (QĐ)</Label>
+            <Input
+              id="highestMilitaryRank"
+              {...register("highestMilitaryRank")}
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="highestTitle">Chức danh cao nhất</Label>
             <Input
               id="highestTitle"
-              value={profile?.highestTitle || ""}
-              onChange={(e) => updateProfile({ highestTitle: e.target.value })}
+              {...register("highestTitle")}
+              disabled={isReadOnly}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="forte">Sở trường công tác</Label>
-            <Input
-              id="forte"
-              value={profile?.forte || ""}
-              onChange={(e) => updateProfile({ forte: e.target.value })}
-            />
+            <Input id="forte" {...register("forte")} disabled={isReadOnly} />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="reward">Khen thưởng</Label>
-            <Input
-              id="reward"
-              value={profile?.reward || ""}
-              onChange={(e) => updateProfile({ reward: e.target.value })}
-            />
+            <Input id="reward" {...register("reward")} disabled={isReadOnly} />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="discipline">Kỷ luật</Label>
             <Input
               id="discipline"
-              value={profile?.discipline || ""}
-              onChange={(e) => updateProfile({ discipline: e.target.value })}
+              {...register("discipline")}
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bhxhNumber">Số sổ BHXH</Label>
+            <Input
+              id="bhxhNumber"
+              {...register("bhxhNumber")}
+              disabled={isReadOnly}
             />
           </div>
         </div>

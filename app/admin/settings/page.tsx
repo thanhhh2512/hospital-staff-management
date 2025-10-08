@@ -606,7 +606,9 @@ export default function SettingsPage() {
       </div>
 
       {/* Toast notifications */}
-      <ToastProvider />
+      <ToastProvider>
+        <div />
+      </ToastProvider>
     </>
   );
 }

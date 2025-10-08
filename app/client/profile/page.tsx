@@ -1,81 +1,407 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProfileHeader } from "@/components/profile/ProfileHeader";
-import { ProfileSuccess } from "@/components/profile/ProfileSuccess";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ProfileEdit } from "@/components/profile/ProfileEdit";
 import { ProfilePreview } from "@/components/profile/ProfilePreview";
-import { generatePDF } from "@/components/profile/pdfUtils";
+import { useProfileStore } from "@/stores";
+import { useAuthStore } from "@/stores";
+import { useTrainingStore } from "@/stores";
+import { toast } from "sonner";
+import { Loader2, Save, Lock, Info } from "lucide-react";
+import type { Profile } from "@/types";
+import {
+  profileFormSchema,
+  getDefaultProfileValues,
+  type ProfileFormData as FormData,
+} from "@/lib/profileFormSchema";
+import { validateImageFile, createFilePreview } from "@/lib/file-utils";
 
+// Store's ProfileFormData interface (from store)
+interface StoreProfileFormData extends Omit<Profile, "avatar"> {
+  avatar?: File;
+}
+
+// Helper function to convert Profile to FormData
+function profileToFormData(profile: Profile, employeeId?: string): FormData {
+  return {
+    employeeId: employeeId || "",
+    fullName: profile.fullName || "",
+    gender: profile.gender || "male",
+    dob: profile.dob || "",
+    birthPlace: profile.birthPlace || "",
+    hometown: profile.hometown || "",
+    ethnicity: profile.ethnicity || "",
+    religion: profile.religion || "",
+    idNumber: profile.idNumber || "",
+    idIssueDate: profile.idIssueDate || "",
+    phone: profile.phone || "",
+    email: profile.email || "",
+    permanentAddress: profile.permanentAddress || "",
+    currentAddress: profile.currentAddress || "",
+    avatar: null, // Handle separately
+    position: profile.position || "",
+    department: profile.department || "",
+    jobTitle: profile.jobTitle || "",
+    hireDate: profile.hireDate || "",
+    hireAgency: profile.hireAgency || "",
+    rank: profile.rank || "",
+    salary: profile.salary || "",
+    salaryDate: profile.salaryDate || "",
+    education: profile.education || "",
+    specialization: profile.specialization || "",
+    politics: profile.politics || "",
+    management: profile.management || "",
+    languageLevel: profile.languageLevel || "",
+    it: profile.it || "",
+    partyJoinDate: profile.partyJoinDate || "",
+    partyOfficialDate: profile.partyOfficialDate || "",
+    health: profile.health || "",
+    familyPolicy: profile.familyPolicy || "",
+    socialOrgJoinDate: profile.socialOrgJoinDate || "",
+    enlistmentDate: profile.enlistmentDate || "",
+    dischargeDate: profile.dischargeDate || "",
+    highestMilitaryRank: profile.highestMilitaryRank || "",
+    highestTitle: profile.highestTitle || "",
+    forte: profile.forte || "",
+    reward: profile.reward || "",
+    discipline: profile.discipline || "",
+    bhxhNumber: profile.bhxhNumber || "",
+    trainings: [], // Will be populated from training store
+  };
+}
+
+// Main Profile page component
 export default function ProfilePage() {
-  const [isLoading, setIsLoading] = useState(false);
+  // Local state
+  const [activeTab, setActiveTab] = useState("edit");
   const [isSaving, setIsSaving] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
+    null
+  );
+  const [isSuccess, setIsSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setAvatarSrc(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // Store state
+  const { user } = useAuthStore();
+  const {
+    profile,
+    hasProfile,
+    isLoading: profileLoading,
+    error,
+    fetchProfile,
+    createProfileApi,
+    clearError,
+  } = useProfileStore();
+  const { trainings, fetchTrainings } = useTrainingStore();
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      setIsSuccess(true);
-      setTimeout(() => {
-        setIsSuccess(false);
-      }, 3000);
-    }, 1500);
-  };
+  // Form setup
+  const methods = useForm<FormData>({
+    defaultValues: getDefaultProfileValues(),
+    resolver: zodResolver(profileFormSchema),
+    shouldUnregister: false,
+    mode: "onChange",
+  });
 
-  const handleDownloadPDF = async () => {
-    setIsLoading(true);
-    try {
-      await generatePDF(profileRef.current);
-    } finally {
-      setIsLoading(false);
+  const {
+    reset,
+    getValues,
+    handleSubmit,
+    formState: { isDirty, isValid },
+  } = methods;
+
+  const employeeId = user?.employeeId;
+
+  useEffect(() => {
+    if (employeeId) {
+      fetchProfile(employeeId);
+      fetchTrainings({ employeeId });
     }
-  };
+  }, [employeeId, fetchProfile, fetchTrainings]);
+
+  useEffect(() => {
+    if (profile && employeeId) {
+      const formData = profileToFormData(profile, employeeId);
+      formData.trainings = trainings || [];
+      reset(formData);
+      setAvatarSrc(profile.avatar || null);
+    }
+  }, [profile, trainings, employeeId, reset]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        clearError();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clearError]);
+
+  const handleAvatarUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const validation = validateImageFile(file);
+        if (!validation.isValid) {
+          toast.error(validation.error);
+          return;
+        }
+
+        setSelectedAvatarFile(file);
+        const previewUrl = createFilePreview(file);
+        setAvatarSrc(previewUrl);
+      }
+    },
+    []
+  );
+
+  const handleCreateProfile = useCallback(() => {
+    if (hasProfile) {
+      toast.error("Hồ sơ đã được tạo. Liên hệ admin nếu cần thay đổi.");
+      return;
+    }
+
+    if (!employeeId) {
+      toast.error("Không thể lưu: thiếu thông tin người dùng");
+      return;
+    }
+
+    handleSubmit(
+      async (formValues) => {
+        setIsSaving(true);
+
+        try {
+          const profileData: StoreProfileFormData = {
+            fullName: formValues.fullName || "",
+            gender: formValues.gender || "male",
+            dob: formValues.dob || "",
+            birthPlace: formValues.birthPlace || "",
+            hometown: formValues.hometown || "",
+            ethnicity: formValues.ethnicity || "",
+            religion: formValues.religion || "",
+            idNumber: formValues.idNumber || "",
+            idIssueDate: formValues.idIssueDate || "",
+            phone: formValues.phone || "",
+            email: formValues.email || "",
+            permanentAddress: formValues.permanentAddress || "",
+            currentAddress: formValues.currentAddress || "",
+            position: formValues.position || "",
+            department: formValues.department || "",
+            jobTitle: formValues.jobTitle || "",
+            hireDate: formValues.hireDate || "",
+            hireAgency: formValues.hireAgency || "",
+            rank: formValues.rank || "",
+            salary: formValues.salary || "",
+            salaryDate: formValues.salaryDate || "",
+            education: formValues.education || "",
+            specialization: formValues.specialization || "",
+            politics: formValues.politics || "",
+            management: formValues.management || "",
+            languageLevel: formValues.languageLevel || "",
+            it: formValues.it || "",
+            partyJoinDate: formValues.partyJoinDate || "",
+            partyOfficialDate: formValues.partyOfficialDate || "",
+            health: formValues.health || "",
+            familyPolicy: formValues.familyPolicy || "",
+            socialOrgJoinDate: formValues.socialOrgJoinDate || "",
+            enlistmentDate: formValues.enlistmentDate || "",
+            dischargeDate: formValues.dischargeDate || "",
+            highestMilitaryRank: formValues.highestMilitaryRank || "",
+            highestTitle: formValues.highestTitle || "",
+            forte: formValues.forte || "",
+            reward: formValues.reward || "",
+            discipline: formValues.discipline || "",
+            bhxhNumber: formValues.bhxhNumber || "",
+            avatar: selectedAvatarFile || undefined,
+          };
+
+          const success = await createProfileApi(employeeId, profileData);
+
+          if (success) {
+            setIsSuccess(true);
+            setActiveTab("preview"); 
+            toast.success("Tạo hồ sơ thành công!");
+
+            setTimeout(() => {
+              setIsSuccess(false);
+            }, 3000);
+          }
+        } catch (error: any) {
+          console.error("Profile creation error:", error);
+          toast.error("Đã xảy ra lỗi khi tạo hồ sơ");
+        } finally {
+          setIsSaving(false);
+        }
+      },
+      (errors) => {
+        const errorMessages = Object.values(errors)
+          .map((error: any) => error?.message)
+          .filter(Boolean);
+        if (errorMessages.length > 0) {
+          toast.error(`Vui lòng kiểm tra lại: ${errorMessages[0]}`);
+        }
+      }
+    )();
+  }, [
+    hasProfile,
+    employeeId,
+    handleSubmit,
+    createProfileApi,
+    selectedAvatarFile,
+  ]);
+
+  if (profileLoading && employeeId) {
+    return (
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-4xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Đang kiểm tra hồ sơ...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!employeeId) {
+    return (
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-4xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <span className="text-muted-foreground">
+            Đang tải thông tin người dùng...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <ProfileHeader
-        isLoading={isLoading}
-        isSaving={isSaving}
-        onSave={handleSave}
-        onDownloadPDF={handleDownloadPDF}
-      />
+    <FormProvider {...methods}>
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-4xl mx-auto">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Lý lịch cá nhân
+            </h1>
+            <p className="text-muted-foreground">
+              {hasProfile
+                ? "Hồ sơ đã được tạo và đang ở chế độ chỉ đọc. Liên hệ admin để chỉnh sửa thông tin."
+                : "Tạo hồ sơ cá nhân của bạn"}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {!hasProfile && (
+              <Button
+                onClick={handleCreateProfile}
+                disabled={
+                  isSaving || !isValid || (!isDirty && !selectedAvatarFile)
+                }
+                size="lg"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Đang tạo hồ sơ...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Tạo hồ sơ
+                  </>
+                )}
+              </Button>
+            )}
 
-      <ProfileSuccess isSuccess={isSuccess} />
+            {hasProfile && (
+              <div className="flex items-center gap-2 text-green-600">
+                <Lock className="h-4 w-4" />
+                <span className="text-sm font-medium">Hồ sơ đã được lưu</span>
+              </div>
+            )}
+          </div>
+        </div>
+        {isSuccess && (
+          <Alert className="border-green-200 bg-green-50">
+            <Info className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              Hồ sơ đã được tạo thành công! Hồ sơ hiện đã được khóa và chỉ có
+              thể xem.
+            </AlertDescription>
+          </Alert>
+        )}
+        {error && (
+          <Alert variant="destructive">
+            <Info className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      <Tabs defaultValue="edit">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="edit">Chỉnh sửa</TabsTrigger>
-          <TabsTrigger value="preview">Xem trước</TabsTrigger>
-        </TabsList>
+        <div ref={profileRef}>
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="edit">
+                {hasProfile ? "Xem thông tin" : "Nhập thông tin"}
+              </TabsTrigger>
+              <TabsTrigger value="preview">Xem trước</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="edit">
-          <ProfileEdit
-            avatarSrc={avatarSrc}
-            fileInputRef={fileInputRef}
-            handleAvatarUpload={handleAvatarUpload}
-          />
-        </TabsContent>
+            <div className={activeTab === "edit" ? "block" : "hidden"}>
+              <div className="mt-4">
+                <ProfileEdit
+                  avatarSrc={avatarSrc}
+                  onAvatarUpload={handleAvatarUpload}
+                  fileInputRef={fileInputRef}
+                  isReadOnly={hasProfile}
+                />
+              </div>
+            </div>
 
-        <TabsContent value="preview">
-          <ProfilePreview profileRef={profileRef} avatarSrc={avatarSrc} />
-        </TabsContent>
-      </Tabs>
-    </div>
+            <div className={activeTab === "preview" ? "block" : "hidden"}>
+              <div className="mt-4">
+                <ProfilePreview avatarSrc={avatarSrc} />
+              </div>
+            </div>
+          </Tabs>
+        </div>
+
+        {!hasProfile && (
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="text-blue-800 text-lg">
+                Hướng dẫn tạo hồ sơ
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-blue-700">
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>
+                  Điền đầy đủ thông tin bắt buộc (có dấu{" "}
+                  <span className="text-red-500">*</span>)
+                </li>
+                <li>Kiểm tra kỹ thông tin trước khi tạo hồ sơ</li>
+                <li>
+                  Sau khi tạo thành công, hồ sơ sẽ được khóa và chỉ có thể xem
+                </li>
+                <li>Liên hệ admin nếu cần chỉnh sửa thông tin sau khi tạo</li>
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </FormProvider>
   );
 }
