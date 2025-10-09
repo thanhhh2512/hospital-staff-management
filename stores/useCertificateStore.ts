@@ -20,31 +20,38 @@ const mockCertificates: Certificate[] = [
   {
     id: "1",
     name: "Bằng Cử nhân Xét nghiệm",
-    type: "degree",
+    type: "DEGREE",
     issueDate: "2012-10-30",
     issuer: "Trường ĐHYD.TP Hồ Chí Minh",
     description: "Tốt nghiệp loại Khá",
-    file: null,
+    fileUrl: null,
+    status: "ACTIVE",
+    employeeName: "Test Employee",
+    employeeId: "EMP001",
   },
   {
     id: "2",
     name: "Chứng chỉ hành nghề Xét nghiệm",
-    type: "certificate",
+    type: "CERTIFICATE",
     issueDate: "2013-05-15",
     issuer: "Bộ Y tế",
     description: "Chứng chỉ hành nghề cho kỹ thuật viên xét nghiệm",
-    file: null,
+    fileUrl: null,
+    status: "ACTIVE",
+    employeeName: "Test Employee",
+    employeeId: "EMP001",
   },
 ];
 
 const mockTrainingHistory: TrainingHistory[] = [
   {
     id: "1",
+    employeeId: "emp1",
     school: "Trường ĐHYD.TP Hồ Chí Minh",
     major: "Xét nghiệm",
     startDate: "11/2009",
     endDate: "10/2012",
-    type: "Liên thông",
+    type: "DEGREE",
     degree: "Cử nhân",
   },
 ];

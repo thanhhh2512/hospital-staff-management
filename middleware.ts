@@ -4,43 +4,27 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Get token from cookies or local storage
-    // Since middleware runs on the server, we need to get token from cookies if available
+    // Fast, cookie-only check
     const token = request.cookies.get('hospital_access_token')?.value;
 
-    // Admin routes protection
-    if (pathname.startsWith('/admin')) {
-        // If no token, redirect to login
-        if (!token) {
-            const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('redirect', pathname);
-            return NextResponse.redirect(loginUrl);
-        }
-
-        // For admin routes, we need to check user role
-        // Since we can't decode JWT in middleware without extra setup,
-        // we'll handle role checking on the client side and redirect here
-
-        // Create a response that will trigger client-side role check
-        const response = NextResponse.next();
-        response.headers.set('x-check-admin-role', 'true');
-        return response;
+    // Guard admin area
+    if (!token && pathname.startsWith('/admin')) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        url.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(url);
     }
 
-    // Client routes protection
-    if (pathname.startsWith('/client')) {
-        // If no token, redirect to login
-        if (!token) {
-            const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('redirect', pathname);
-            return NextResponse.redirect(loginUrl);
-        }
+    // Guard client area
+    if (!token && pathname.startsWith('/client')) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        url.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(url);
     }
 
-    // Redirect authenticated users away from auth pages
+    // Redirect authenticated users away from login/register
     if (token && (pathname === '/login' || pathname === '/register')) {
-        // Default redirect to client dashboard
-        // The actual role-based redirect will be handled on client side
         return NextResponse.redirect(new URL('/client/dashboard', request.url));
     }
 
@@ -49,9 +33,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/admin/:path*',
-        '/client/:path*',
-        '/login',
-        '/register'
-    ]
+        // Exclude Next internals and static assets from middleware
+        '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:js|mjs|css|map|json|png|jpg|jpeg|gif|svg|webp|ico|ttf|woff|woff2)).*)',
+    ],
 };

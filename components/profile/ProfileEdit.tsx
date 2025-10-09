@@ -36,7 +36,7 @@ export function ProfileEdit({
         isReadOnly={isReadOnly}
       />
       <ProfessionalInfo isReadOnly={isReadOnly} />
-      <TrainingInfo isReadOnly={isReadOnly} />
+      <TrainingInfo />
     </div>
   );
 }

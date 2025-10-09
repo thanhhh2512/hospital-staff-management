@@ -5,7 +5,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Award, Briefcase, FileText, Syringe, User } from "lucide-react";
+import {
+  Award,
+  Briefcase,
+  FileText,
+  Syringe,
+  User,
+  GraduationCap,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function ClientDashboard() {
@@ -21,6 +28,12 @@ export default function ClientDashboard() {
       description: "Quản lý bằng cấp và chứng chỉ hành nghề",
       icon: Award,
       href: "/client/certificates",
+    },
+    {
+      title: "Quá trình đào tạo",
+      description: "Quản lý quá trình đào tạo và học tập",
+      icon: GraduationCap,
+      href: "/client/training",
     },
     {
       title: "Mô tả công việc",

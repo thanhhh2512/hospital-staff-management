@@ -26,7 +26,7 @@ const mockVaccinations: Vaccination[] = [
     date: "2021-08-15",
     location: "Trung tâm Y tế Quận Ninh Kiều",
     notes: "Mũi 1",
-    file: null,
+    fileUrl: null,
     nextDose: "2021-09-05",
   },
   {
@@ -35,7 +35,7 @@ const mockVaccinations: Vaccination[] = [
     date: "2021-09-05",
     location: "Trung tâm Y tế Quận Ninh Kiều",
     notes: "Mũi 2",
-    file: null,
+    fileUrl: null,
   },
 ];
 
@@ -45,7 +45,7 @@ const mockCertificates: VaccinationCertificate[] = [
     name: "Chứng nhận tiêm chủng COVID-19",
     issueDate: "2021-09-15",
     issuer: "Sở Y tế Thành phố Cần Thơ",
-    file: null,
+    fileUrl: null,
   },
   {
     id: "2",
@@ -53,7 +53,7 @@ const mockCertificates: VaccinationCertificate[] = [
     issueDate: "2020-03-10",
     expiryDate: "2030-03-10",
     issuer: "Bệnh viện Đa khoa Thành phố Cần Thơ",
-    file: null,
+    fileUrl: null,
   },
 ];
 

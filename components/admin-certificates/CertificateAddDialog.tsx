@@ -41,12 +41,12 @@ export function CertificateAddDialog({
       employeeName: "",
       employeeId: "",
       name: "",
-      type: "degree",
+      type: "DEGREE",
       issueDate: "",
       issuer: "",
       description: "",
-      status: "active",
-      file: null,
+      status: "ACTIVE",
+      fileUrl: null,
     }
   );
 
@@ -61,7 +61,7 @@ export function CertificateAddDialog({
       const result = await uploadFile(file);
       setNewCertificate({
         ...newCertificate,
-        file: result.url,
+        fileUrl: result.url,
       });
       toast({
         title: "Tải lên thành công",
@@ -89,7 +89,7 @@ export function CertificateAddDialog({
   const handleRemoveFile = () => {
     setNewCertificate({
       ...newCertificate,
-      file: null,
+      fileUrl: null,
     });
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -102,12 +102,12 @@ export function CertificateAddDialog({
       employeeName: "",
       employeeId: "",
       name: "",
-      type: "degree",
+      type: "DEGREE",
       issueDate: "",
       issuer: "",
       description: "",
-      status: "active",
-      file: null,
+      status: "ACTIVE",
+      fileUrl: null,
     });
   };
 
@@ -168,7 +168,7 @@ export function CertificateAddDialog({
                 onValueChange={(value) =>
                   setNewCertificate({
                     ...newCertificate,
-                    type: value as "degree" | "certificate",
+                    type: value as "DEGREE" | "CERTIFICATE" | "OTHER",
                   })
                 }
               >
@@ -176,8 +176,9 @@ export function CertificateAddDialog({
                   <SelectValue placeholder="Chọn loại" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="degree">Bằng cấp</SelectItem>
-                  <SelectItem value="certificate">Chứng chỉ</SelectItem>
+                  <SelectItem value="DEGREE">Bằng cấp</SelectItem>
+                  <SelectItem value="CERTIFICATE">Chứng chỉ</SelectItem>
+                  <SelectItem value="OTHER">Khác</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -216,7 +217,7 @@ export function CertificateAddDialog({
                 onValueChange={(value) =>
                   setNewCertificate({
                     ...newCertificate,
-                    status: value as "active" | "expired" | "pending",
+                    status: value as "ACTIVE" | "EXPIRED" | "PENDING",
                   })
                 }
               >
@@ -224,9 +225,9 @@ export function CertificateAddDialog({
                   <SelectValue placeholder="Chọn trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Hiện hành</SelectItem>
-                  <SelectItem value="expired">Hết hạn</SelectItem>
-                  <SelectItem value="pending">Chờ duyệt</SelectItem>
+                  <SelectItem value="ACTIVE">Hiện hành</SelectItem>
+                  <SelectItem value="EXPIRED">Hết hạn</SelectItem>
+                  <SelectItem value="PENDING">Chờ duyệt</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -234,16 +235,16 @@ export function CertificateAddDialog({
           <div className="space-y-2">
             <Label>Hình ảnh bằng cấp/chứng chỉ</Label>
             <div className="flex flex-col items-center gap-4 rounded-md border border-dashed p-4">
-              {newCertificate.file ? (
+              {newCertificate.fileUrl ? (
                 <div className="relative w-full">
-                  {newCertificate.file.endsWith(".pdf") ? (
+                  {newCertificate.fileUrl.endsWith(".pdf") ? (
                     <div className="flex items-center justify-center p-4 bg-muted rounded-md">
                       <FileText className="h-10 w-10 text-muted-foreground" />
                       <p className="ml-2">PDF Document</p>
                     </div>
                   ) : (
                     <img
-                      src={newCertificate.file}
+                      src={newCertificate.fileUrl}
                       alt="Preview"
                       className="max-h-[200px] w-full object-contain rounded-md"
                     />

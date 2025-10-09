@@ -1,17 +1,28 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { FileText, User, Award, Briefcase, Syringe, LogOut, Menu, X, Home } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ModeToggle } from "@/components/mode-toggle"
-import { cn } from "@/lib/utils"
-import { useState, useEffect } from "react"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  FileText,
+  User,
+  Award,
+  Briefcase,
+  Syringe,
+  LogOut,
+  Menu,
+  X,
+  Home,
+  GraduationCap,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
+import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface CustomField {
-  id: string
-  name: string
-  slug: string
+  id: string;
+  name: string;
+  slug: string;
 }
 
 const defaultNavItems = [
@@ -31,6 +42,11 @@ const defaultNavItems = [
     icon: Award,
   },
   {
+    title: "Quá trình đào tạo",
+    href: "/client/training",
+    icon: GraduationCap,
+  },
+  {
     title: "Mô tả công việc",
     href: "/client/job-description",
     icon: Briefcase,
@@ -40,19 +56,19 @@ const defaultNavItems = [
     href: "/client/vaccination",
     icon: Syringe,
   },
-]
+];
 
 export function ClientSidebar() {
-  const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
-  const [customFields, setCustomFields] = useState<CustomField[]>([])
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
 
   useEffect(() => {
-    const storedFields = localStorage.getItem("customFields")
+    const storedFields = localStorage.getItem("customFields");
     if (storedFields) {
-      setCustomFields(JSON.parse(storedFields))
+      setCustomFields(JSON.parse(storedFields));
     }
-  }, [])
+  }, []);
 
   return (
     <>
@@ -69,12 +85,19 @@ export function ClientSidebar() {
 
       {/* Mobile sidebar */}
       <div
-        className={cn("fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden", isOpen ? "block" : "hidden")}
+        className={cn(
+          "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden",
+          isOpen ? "block" : "hidden"
+        )}
       >
         <div className="fixed left-0 top-0 h-full w-3/4 max-w-xs border-r bg-background p-6 shadow-lg overflow-y-auto">
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold">Menu</span>
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+            >
               <X className="h-5 w-5" />
               <span className="sr-only">Đóng menu</span>
             </Button>
@@ -87,7 +110,9 @@ export function ClientSidebar() {
                 onClick={() => setIsOpen(false)}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                  pathname === item.href ? "bg-accent text-accent-foreground" : "transparent",
+                  pathname === item.href
+                    ? "bg-accent text-accent-foreground"
+                    : "transparent"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -138,7 +163,9 @@ export function ClientSidebar() {
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                  pathname === item.href ? "bg-accent text-accent-foreground" : "transparent",
+                  pathname === item.href
+                    ? "bg-accent text-accent-foreground"
+                    : "transparent"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -157,7 +184,9 @@ export function ClientSidebar() {
                     href={`/client/custom/${field.slug}`}
                     className={cn(
                       "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                      pathname === `/client/custom/${field.slug}` ? "bg-accent text-accent-foreground" : "transparent",
+                      pathname === `/client/custom/${field.slug}`
+                        ? "bg-accent text-accent-foreground"
+                        : "transparent"
                     )}
                   >
                     <FileText className="h-5 w-5" />
@@ -179,5 +208,5 @@ export function ClientSidebar() {
         </div>
       </div>
     </>
-  )
+  );
 }

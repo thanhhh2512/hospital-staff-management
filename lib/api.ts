@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 
+// Types for API responses
 interface ApiResponse<T = any> {
     success: boolean;
     message: string;
@@ -74,19 +75,24 @@ class ApiClient {
         endpointOrUrl: string,
         options: RequestInit = {}
     ): Promise<T> {
+        // If endpointOrUrl starts with http, treat as absolute URL
         const url = endpointOrUrl.startsWith('http') ? endpointOrUrl : `${this.baseURL}${endpointOrUrl}`;
         const accessToken = TokenManager.getAccessToken();
 
+        // Default headers - only set Content-Type for non-FormData requests
         const headers: Record<string, string> = {};
 
+        // Only set Content-Type to JSON if body is not FormData
         if (!(options.body instanceof FormData)) {
             headers['Content-Type'] = 'application/json';
         }
 
+        // Merge existing headers
         if (options.headers) {
             Object.assign(headers, options.headers);
         }
 
+        // Add auth header if token exists
         if (accessToken) {
             headers.Authorization = `Bearer ${accessToken}`;
         }
@@ -97,9 +103,11 @@ class ApiClient {
                 headers,
             });
 
+            // Handle 401 - try to refresh token
             if (response.status === 401 && accessToken) {
                 const newToken = await this.handleTokenRefresh();
                 if (newToken) {
+                    // Retry with new token
                     headers.Authorization = `Bearer ${newToken}`;
                     const retryResponse = await fetch(url, {
                         ...options,
@@ -121,7 +129,11 @@ class ApiClient {
         const isJson = contentType?.includes('application/json');
 
         try {
+            // Handle 304 Not Modified - browser should use cached data
             if (response.status === 304) {
+                console.log('Resource not modified (304), server indicates cache is still valid');
+                // For 304, we should rely on browser cache or return a special indicator
+                // that the calling code can handle appropriately
                 return {
                     success: true,
                     message: 'Data not modified',
@@ -155,6 +167,7 @@ class ApiClient {
 
             if (isJson) {
                 const data = await response.json();
+                console.log('API Response:', data); // Debug log
                 return data;
             } else {
                 return response.text() as unknown as T;
@@ -204,6 +217,7 @@ class ApiClient {
 
             if (!response.ok) {
                 TokenManager.clearTokens();
+                // Redirect to login or trigger logout
                 if (typeof window !== 'undefined') {
                     window.location.href = '/login';
                 }
@@ -225,7 +239,7 @@ class ApiClient {
     }
 
     private handleError(error: any): void {
-        console.error('API Error:', error); 
+        console.error('API Error:', error); // Always log errors for debugging
 
         let message = 'Đã xảy ra lỗi không mong muốn';
 
@@ -236,6 +250,8 @@ class ApiClient {
         } else if (typeof error === 'string') {
             message = error;
         }
+
+        // Only show toast for non-auth errors to avoid duplicate notifications
         if (!message.toLowerCase().includes('authentication') &&
             !message.toLowerCase().includes('unauthorized')) {
             toast.error(message);
@@ -258,6 +274,7 @@ class ApiClient {
             method: 'GET',
         };
 
+        // Add cache-busting headers if requested
         if (options?.noCache) {
             const headers = new Headers();
             headers.append('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -297,6 +314,7 @@ class ApiClient {
         if (accessToken) {
             headers.Authorization = `Bearer ${accessToken}`;
         }
+        // Do NOT set Content-Type - let browser handle multipart boundary
 
         return this.makeRequest<T>(endpoint, {
             method: 'POST',
@@ -313,6 +331,7 @@ class ApiClient {
         if (accessToken) {
             headers.Authorization = `Bearer ${accessToken}`;
         }
+        // Do NOT set Content-Type - let browser handle multipart boundary
 
         return this.makeRequest<T>(endpoint, {
             method: 'POST',
@@ -328,6 +347,7 @@ class ApiClient {
         if (accessToken) {
             headers.Authorization = `Bearer ${accessToken}`;
         }
+        // Do NOT set Content-Type - let browser handle multipart boundary
 
         return this.makeRequest<T>(endpoint, {
             method: 'PUT',
@@ -337,7 +357,9 @@ class ApiClient {
     }
 }
 
+// Create a singleton instance
 const api = new ApiClient();
 
+// Export both the instance and types
 export { api, TokenManager };
 export type { ApiResponse, PaginatedResponse, ApiError };

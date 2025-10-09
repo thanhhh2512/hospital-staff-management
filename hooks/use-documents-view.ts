@@ -44,14 +44,14 @@ export const useDocumentsView = () => {
           docs.push({
             id: `cert-${cert.id}`,
             title: cert.name,
-            category: cert.type === "degree" ? "degree" : "certificate",
+            category: cert.type === "DEGREE" ? "degree" : "certificate",
             employeeName: employee.name,
             employeeId: employee.id,
             uploadDate: cert.issueDate,
             status:
-              cert.status === "expired" ? "archived" : cert.status || "active",
+              cert.status === "EXPIRED" ? "archived" as const : cert.status === "ACTIVE" ? "active" as const : "pending" as const,
             description: cert.description,
-            file: cert.file,
+            file: cert.fileUrl,
             sourceType: "certificate",
             sourceId: cert.id,
           });
@@ -75,7 +75,7 @@ export const useDocumentsView = () => {
             uploadDate: vacc.date,
             status: "active",
             description: vacc.notes,
-            file: vacc.file,
+            file: vacc.fileUrl,
             sourceType: "vaccination",
             sourceId: vacc.id,
           });

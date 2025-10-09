@@ -89,7 +89,7 @@ export function CertificateList({
         <TabsContent value="active" className="mt-4">
           <DataTable
             columns={columns}
-            data={certificates.filter((cert) => cert.status === "active")}
+            data={certificates.filter((cert) => cert.status === "ACTIVE")}
             searchColumn="employeeName"
             searchPlaceholder="Tìm kiếm theo tên nhân viên..."
           />
@@ -97,7 +97,7 @@ export function CertificateList({
         <TabsContent value="expired" className="mt-4">
           <DataTable
             columns={columns}
-            data={certificates.filter((cert) => cert.status === "expired")}
+            data={certificates.filter((cert) => cert.status === "EXPIRED")}
             searchColumn="employeeName"
             searchPlaceholder="Tìm kiếm theo tên nhân viên..."
           />
@@ -105,7 +105,7 @@ export function CertificateList({
         <TabsContent value="pending" className="mt-4">
           <DataTable
             columns={columns}
-            data={certificates.filter((cert) => cert.status === "pending")}
+            data={certificates.filter((cert) => cert.status === "PENDING")}
             searchColumn="employeeName"
             searchPlaceholder="Tìm kiếm theo tên nhân viên..."
           />

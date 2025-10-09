@@ -61,12 +61,12 @@ export function CertificateList({
             )}
           </CardContent>
           <CardFooter className="flex justify-between pt-2">
-            {certificate.file ? (
+            {certificate.fileUrl ? (
               <Button
                 variant="outline"
                 size="sm"
                 className="gap-1"
-                onClick={() => onViewFile?.(certificate.file!)}
+                onClick={() => onViewFile?.(certificate.fileUrl!)}
               >
                 <FileImage className="h-4 w-4" />
                 Xem

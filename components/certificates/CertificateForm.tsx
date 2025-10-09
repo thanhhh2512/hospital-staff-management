@@ -20,11 +20,15 @@ import {
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import type { Certificate } from "@/types";
+import { validateDocumentFile } from "@/lib/file-utils";
+import { toast } from "sonner";
 
 interface CertificateFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (certificate: Omit<Certificate, "id">) => void;
+  onSave: (
+    certificate: Omit<Certificate, "id"> & { certificateFile?: File }
+  ) => void;
   certificate?: Certificate;
 }
 
@@ -35,17 +39,21 @@ export function CertificateForm({
   certificate,
 }: CertificateFormProps) {
   const [formData, setFormData] = useState<Omit<Certificate, "id">>({
+    employeeId: certificate?.employeeId || "", // This will be overridden by the current user's employeeId
     name: certificate?.name || "",
-    type: certificate?.type || "degree",
+    type: certificate?.type || "DEGREE",
     issueDate: certificate?.issueDate || new Date().toISOString().split("T")[0],
     issuer: certificate?.issuer || "",
     description: certificate?.description || "",
-    file: certificate?.file || null,
+    fileUrl: certificate?.fileUrl || null,
+    status: certificate?.status || "ACTIVE",
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    certificate?.file || null
+    certificate?.fileUrl || null
   );
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -61,18 +69,32 @@ export function CertificateForm({
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file using utility function
+      const validation = validateDocumentFile(file);
+      if (!validation.isValid) {
+        toast.error(validation.error);
+        return;
+      }
+
+      // Store the actual file for API submission
+      setSelectedFile(file);
+
+      // Create preview for UI
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
         setPreviewUrl(result);
-        setFormData({ ...formData, file: result });
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = () => {
-    onSave(formData);
+    // Include both the form data and the file
+    onSave({
+      ...formData,
+      certificateFile: selectedFile || undefined,
+    });
     onClose();
   };
 
@@ -104,9 +126,9 @@ export function CertificateForm({
                 <SelectValue placeholder="Chọn loại" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="degree">Bằng cấp</SelectItem>
-                <SelectItem value="certificate">Chứng chỉ hành nghề</SelectItem>
-                <SelectItem value="other">Khác</SelectItem>
+                <SelectItem value="DEGREE">Bằng cấp</SelectItem>
+                <SelectItem value="CERTIFICATE">Chứng chỉ hành nghề</SelectItem>
+                <SelectItem value="OTHER">Khác</SelectItem>
               </SelectContent>
             </Select>
           </div>

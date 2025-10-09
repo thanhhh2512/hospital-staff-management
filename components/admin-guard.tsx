@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores";
 import { Loader2 } from "lucide-react";
@@ -13,34 +13,34 @@ export function AdminGuard({ children }: AdminGuardProps) {
   const router = useRouter();
   const { user, isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const didRedirect = useRef(false);
 
   useEffect(() => {
     setMounted(true);
-    if (!isAuthenticated && !user) {
+  }, []);
+
+  // Fetch auth once if unknown
+  useEffect(() => {
+    if (!isAuthenticated && !user && !isLoading) {
       checkAuth();
     }
-  }, [checkAuth, isAuthenticated, user]);
+  }, [isAuthenticated, user, isLoading, checkAuth]);
 
+  // Single redirect effect with guard against multiple calls
   useEffect(() => {
-    if (!mounted) return;
-    const timeout = setTimeout(() => {
-      if (!isAuthenticated && !isLoading) {
-        router.replace("/login");
-      }
-    }, 3000); 
+    if (!mounted || didRedirect.current) return;
 
-    return () => clearTimeout(timeout);
-  }, [mounted, isAuthenticated, isLoading, router]);
-
-  useEffect(() => {
-    if (!mounted) return;
-
+    // Not authenticated and not loading - redirect to login
     if (!isLoading && !isAuthenticated && !user) {
+      didRedirect.current = true;
       router.replace("/login");
       return;
     }
 
+    // Authenticated but non-admin role - redirect to client dashboard
     if (isAuthenticated && user && user.role !== "admin") {
+      didRedirect.current = true;
+      router.replace("/client/dashboard");
       return;
     }
   }, [mounted, isLoading, isAuthenticated, user, router]);
@@ -49,6 +49,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
     return null;
   }
 
+  // Show loading while auth state is unknown or during loading
   if ((isLoading && !user) || (!isAuthenticated && !user)) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -71,6 +72,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
     );
   }
 
+  // User has wrong role
   if (user && user.role !== "admin") {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -90,6 +92,6 @@ export function AdminGuard({ children }: AdminGuardProps) {
       </div>
     );
   }
-  
+
   return <>{children}</>;
 }

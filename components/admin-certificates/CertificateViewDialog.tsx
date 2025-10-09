@@ -26,20 +26,20 @@ export function CertificateViewDialog({
   if (!certificate) return null;
 
   const handleDownload = () => {
-    if (!certificate.file) return;
+    if (!certificate.fileUrl) return;
 
     // Create a temporary link element
     const link = document.createElement("a");
-    link.href = certificate.file;
+    link.href = certificate.fileUrl;
     link.download = `${certificate.name}-${
       certificate.employeeName || "certificate"
-    }${certificate.file.endsWith(".pdf") ? ".pdf" : ".jpg"}`;
+    }${certificate.fileUrl.endsWith(".pdf") ? ".pdf" : ".jpg"}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const isPDF = certificate.file?.toLowerCase().endsWith(".pdf");
+  const isPDF = certificate.fileUrl?.toLowerCase().endsWith(".pdf");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,7 +66,7 @@ export function CertificateViewDialog({
             </div>
             <div>
               <h3 className="text-sm font-medium">Loại</h3>
-              <p>{certificate.type === "degree" ? "Bằng cấp" : "Chứng chỉ"}</p>
+              <p>{certificate.type === "DEGREE" ? "Bằng cấp" : certificate.type === "CERTIFICATE" ? "Chứng chỉ" : "Khác"}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium">Ngày cấp</h3>
@@ -82,16 +82,16 @@ export function CertificateViewDialog({
               <h3 className="text-sm font-medium">Trạng thái</h3>
               <Badge
                 variant={
-                  certificate.status === "active"
+                  certificate.status === "ACTIVE"
                     ? "default"
-                    : certificate.status === "expired"
+                    : certificate.status === "EXPIRED"
                     ? "destructive"
                     : "secondary"
                 }
               >
-                {certificate.status === "active"
+                {certificate.status === "ACTIVE"
                   ? "Hiện hành"
-                  : certificate.status === "expired"
+                  : certificate.status === "EXPIRED"
                   ? "Hết hạn"
                   : "Chờ duyệt"}
               </Badge>
@@ -102,7 +102,7 @@ export function CertificateViewDialog({
             <h3 className="mb-2 text-sm font-medium">
               Hình ảnh bằng cấp/chứng chỉ
             </h3>
-            {certificate.file ? (
+            {certificate.fileUrl ? (
               <div className="space-y-2">
                 {isPDF ? (
                   <div className="flex items-center justify-center h-[200px] bg-muted rounded-md">
@@ -111,7 +111,7 @@ export function CertificateViewDialog({
                   </div>
                 ) : (
                   <img
-                    src={certificate.file}
+                    src={certificate.fileUrl}
                     alt={certificate.name}
                     className="max-h-[300px] w-full rounded-md object-contain"
                   />

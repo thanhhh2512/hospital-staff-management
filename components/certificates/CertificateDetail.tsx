@@ -40,18 +40,18 @@ export function CertificateDetail({
         <DialogHeader>
           <DialogTitle>{certificate.name}</DialogTitle>
           <DialogDescription>
-            {certificate.type === "degree"
+            {certificate.type === "DEGREE"
               ? "Bằng cấp"
-              : certificate.type === "certificate"
+              : certificate.type === "CERTIFICATE"
               ? "Chứng chỉ hành nghề"
               : "Khác"}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="aspect-video w-full bg-muted">
-            {certificate.file ? (
+            {certificate.fileUrl ? (
               <img
-                src={certificate.file || "/placeholder.svg"}
+                src={certificate.fileUrl || "/placeholder.svg"}
                 alt={certificate.name}
                 className="h-full w-full object-contain"
               />

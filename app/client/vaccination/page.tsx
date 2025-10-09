@@ -76,7 +76,7 @@ export default function VaccinationPage() {
       const newVaccination: Vaccination = {
         id: Date.now().toString(),
         ...data,
-        file: fileUrl,
+        fileUrl: fileUrl,
       };
 
       setVaccinations((prev) => [...prev, newVaccination]);

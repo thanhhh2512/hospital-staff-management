@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores";
 import { Loader2 } from "lucide-react";
@@ -13,35 +13,33 @@ export function ClientGuard({ children }: ClientGuardProps) {
   const router = useRouter();
   const { user, isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const didRedirect = useRef(false);
 
   useEffect(() => {
     setMounted(true);
-    if (!isAuthenticated && !user) {
+  }, []);
+
+  // Fetch auth once if unknown
+  useEffect(() => {
+    if (!isAuthenticated && !user && !isLoading) {
       checkAuth();
     }
-  }, [checkAuth, isAuthenticated, user]);
+  }, [isAuthenticated, user, isLoading, checkAuth]);
 
+  // Single redirect effect with guard against multiple calls
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || didRedirect.current) return;
 
-    const timeout = setTimeout(() => {
-      if (!isAuthenticated && !isLoading && !user) {
-        router.replace("/login");
-      }
-    }, 2000); 
-
-    return () => clearTimeout(timeout);
-  }, [mounted, isAuthenticated, isLoading, user, router]);
-
-  useEffect(() => {
-    if (!mounted) return;
-
+    // Not authenticated and not loading - redirect to login
     if (!isLoading && !isAuthenticated && !user) {
+      didRedirect.current = true;
       router.replace("/login");
       return;
     }
 
+    // Authenticated but admin role - redirect to admin dashboard
     if (isAuthenticated && user && user.role === "admin") {
+      didRedirect.current = true;
       router.replace("/admin/dashboard");
       return;
     }
@@ -51,6 +49,7 @@ export function ClientGuard({ children }: ClientGuardProps) {
     return null;
   }
 
+  // Show loading while auth state is unknown or during loading
   if ((isLoading && !user) || (!isAuthenticated && !user)) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -73,6 +72,7 @@ export function ClientGuard({ children }: ClientGuardProps) {
     );
   }
 
+  // User has wrong role
   if (user && user.role !== "client") {
     return (
       <div className="flex h-screen items-center justify-center">

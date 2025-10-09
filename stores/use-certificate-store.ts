@@ -79,17 +79,17 @@ export const useCertificateStore = create<CertificateState>((set, get) => ({
 
       if (response.success) {
         const mappedCertificates = response.data.map((cert: any) => ({
-          id: cert.id,
+          id: cert._id,
           name: cert.name,
-          type: cert.type?.toLowerCase() as "degree" | "certificate" | "other" || "certificate",
+          type: cert.type as "DEGREE" | "CERTIFICATE" | "OTHER",
           issuer: cert.issuer,
           issueDate: cert.issueDate,
           expiryDate: cert.expiryDate,
           description: cert.description || "",
-          file: cert.certificateUrl || null,
+          fileUrl: cert.fileUrl ?? null,
           employeeId: cert.employeeId,
           employeeName: cert.employeeName || "",
-          status: cert.status?.toLowerCase() as "active" | "expired" | "pending" || "active"
+          status: cert.status as "ACTIVE" | "EXPIRED" | "PENDING"
         }));
 
         set({
@@ -115,17 +115,17 @@ export const useCertificateStore = create<CertificateState>((set, get) => ({
 
       if (response.success && response.data) {
         const certificate = {
-          id: response.data.id,
+          id: response.data._id,
           name: response.data.name,
-          type: response.data.type?.toLowerCase() as "degree" | "certificate" | "other" || "certificate",
+          type: response.data.type as "DEGREE" | "CERTIFICATE" | "OTHER",
           issuer: response.data.issuer,
           issueDate: response.data.issueDate,
           expiryDate: response.data.expiryDate,
           description: response.data.description || "",
-          file: response.data.certificateUrl || null,
+          fileUrl: response.data.fileUrl ?? null,
           employeeId: response.data.employeeId,
           employeeName: response.data.employeeName || "",
-          status: response.data.status?.toLowerCase() as "active" | "expired" | "pending" || "active"
+          status: response.data.status as "ACTIVE" | "EXPIRED" | "PENDING"
         };
 
         set({
@@ -161,17 +161,17 @@ export const useCertificateStore = create<CertificateState>((set, get) => ({
 
       if (response.success && response.data) {
         const newCertificate = {
-          id: response.data.id,
+          id: response.data._id,
           name: response.data.name,
-          type: response.data.type?.toLowerCase() as "degree" | "certificate" | "other" || "certificate",
+          type: response.data.type as "DEGREE" | "CERTIFICATE" | "OTHER",
           issuer: response.data.issuer,
           issueDate: response.data.issueDate,
           expiryDate: response.data.expiryDate,
           description: response.data.description || "",
-          file: response.data.certificateUrl || null,
+          fileUrl: response.data.fileUrl ?? null,
           employeeId: response.data.employeeId,
           employeeName: "",
-          status: response.data.status?.toLowerCase() as "active" | "expired" | "pending" || "active"
+          status: response.data.status as "ACTIVE" | "EXPIRED" | "PENDING"
         };
 
         set((state) => ({
@@ -213,17 +213,17 @@ export const useCertificateStore = create<CertificateState>((set, get) => ({
 
       if (response.success && response.data) {
         const updatedCertificate = {
-          id: response.data.id,
+          id: response.data._id,
           name: response.data.name,
-          type: response.data.type?.toLowerCase() as "degree" | "certificate" | "other" || "certificate",
+          type: response.data.type as "DEGREE" | "CERTIFICATE" | "OTHER",
           issuer: response.data.issuer,
           issueDate: response.data.issueDate,
           expiryDate: response.data.expiryDate,
           description: response.data.description || "",
-          file: response.data.certificateUrl || null,
+          fileUrl: response.data.fileUrl ?? null,
           employeeId: response.data.employeeId,
           employeeName: "",
-          status: response.data.status?.toLowerCase() as "active" | "expired" | "pending" || "active"
+          status: response.data.status as "ACTIVE" | "EXPIRED" | "PENDING"
         };
 
         set((state) => ({
@@ -283,17 +283,17 @@ export const useCertificateStore = create<CertificateState>((set, get) => ({
 
       if (response.success) {
         const mappedCertificates = response.data.map((cert: any) => ({
-          id: cert.id,
+          id: cert._id,
           name: cert.name,
-          type: cert.type?.toLowerCase() as "degree" | "certificate" | "other" || "certificate",
+          type: cert.type as "DEGREE" | "CERTIFICATE" | "OTHER",
           issuer: cert.issuer || "",
           issueDate: cert.issueDate || "",
           expiryDate: cert.expiryDate,
           description: cert.description || "",
-          file: cert.certificateUrl || null,
+          fileUrl: cert.fileUrl ?? null,
           employeeId: cert.employeeId,
           employeeName: cert.employeeName || "",
-          status: "expired" as "active" | "expired" | "pending"
+          status: cert.status as "ACTIVE" | "EXPIRED" | "PENDING"
         }));
 
         set({ certificates: mappedCertificates });

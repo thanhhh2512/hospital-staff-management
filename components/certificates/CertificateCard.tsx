@@ -13,20 +13,19 @@ import type { Certificate } from "@/types";
 interface CertificateCardProps {
   certificate: Certificate;
   onView: (certificate: Certificate) => void;
-  onDelete: (id: string) => void;
 }
 
 export function CertificateCard({
   certificate,
   onView,
-  onDelete,
 }: CertificateCardProps) {
+  console.log("Certificate", certificate)
   return (
     <Card key={certificate.id} className="overflow-hidden">
       <div className="aspect-video bg-muted">
-        {certificate.file ? (
+        {certificate.fileUrl ? (
           <img
-            src={certificate.file || "/placeholder.svg"}
+            src={certificate.fileUrl || "/placeholder.svg"}
             alt={certificate.name}
             className="h-full w-full object-cover"
           />
@@ -39,9 +38,9 @@ export function CertificateCard({
       <CardHeader>
         <CardTitle>{certificate.name}</CardTitle>
         <CardDescription>
-          {certificate.type === "degree"
+          {certificate.type === "DEGREE"
             ? "Bằng cấp"
-            : certificate.type === "certificate"
+            : certificate.type === "CERTIFICATE"
             ? "Chứng chỉ hành nghề"
             : "Khác"}
         </CardDescription>
@@ -63,14 +62,10 @@ export function CertificateCard({
           </p>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={() => onView(certificate)}>
+      <CardFooter >
+        <Button className="w-full" variant="outline" onClick={() => onView(certificate)}>
           <Eye className="mr-2 h-4 w-4" />
           Xem chi tiết
-        </Button>
-        <Button variant="destructive" onClick={() => onDelete(certificate.id)}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          Xóa
         </Button>
       </CardFooter>
     </Card>

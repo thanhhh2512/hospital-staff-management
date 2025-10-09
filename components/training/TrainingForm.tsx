@@ -10,12 +10,21 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { TrainingHistory } from "@/types";
 
 interface TrainingFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (training: Omit<TrainingHistory, "id">) => void;
+  onSave: (
+    training: Omit<TrainingHistory, "id" | "createdAt" | "updatedAt">
+  ) => void;
   training?: TrainingHistory;
 }
 
@@ -25,17 +34,24 @@ export function TrainingForm({
   onSave,
   training,
 }: TrainingFormProps) {
-  const [formData, setFormData] = useState<Omit<TrainingHistory, "id">>({
+  const [formData, setFormData] = useState<
+    Omit<TrainingHistory, "id" | "createdAt" | "updatedAt">
+  >({
+    employeeId: training?.employeeId || "",
     school: training?.school || "",
     major: training?.major || "",
     startDate: training?.startDate || "",
     endDate: training?.endDate || "",
-    type: training?.type || "",
+    type: training?.type || "COURSE",
     degree: training?.degree || "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData({ ...formData, [name]: value });
   };
 
@@ -63,6 +79,7 @@ export function TrainingForm({
               name="school"
               value={formData.school}
               onChange={handleChange}
+              required
             />
           </div>
           <div className="grid gap-2">
@@ -72,39 +89,48 @@ export function TrainingForm({
               name="major"
               value={formData.major}
               onChange={handleChange}
+              required
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="startDate">Từ tháng, năm</Label>
+              <Label htmlFor="startDate">Từ ngày</Label>
               <Input
                 id="startDate"
                 name="startDate"
+                type="date"
                 value={formData.startDate}
                 onChange={handleChange}
-                placeholder="MM/YYYY"
+                required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="endDate">Đến tháng, năm</Label>
+              <Label htmlFor="endDate">Đến ngày</Label>
               <Input
                 id="endDate"
                 name="endDate"
-                value={formData.endDate}
+                type="date"
+                value={formData.endDate || ""}
                 onChange={handleChange}
-                placeholder="MM/YYYY hoặc Hiện tại"
               />
             </div>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="type">Hình thức đào tạo</Label>
-            <Input
-              id="type"
-              name="type"
+            <Label htmlFor="type">Loại đào tạo</Label>
+            <Select
               value={formData.type}
-              onChange={handleChange}
-              placeholder="Chính quy, Liên thông, v.v."
-            />
+              onValueChange={(value) => handleSelectChange("type", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn loại đào tạo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="DEGREE">Bằng cấp</SelectItem>
+                <SelectItem value="CERTIFICATE">Chứng chỉ</SelectItem>
+                <SelectItem value="COURSE">Khóa học</SelectItem>
+                <SelectItem value="OTHER">Khác</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="degree">Văn bằng, chứng chỉ</Label>
@@ -113,7 +139,8 @@ export function TrainingForm({
               name="degree"
               value={formData.degree}
               onChange={handleChange}
-              placeholder="Cử nhân, Thạc sĩ, v.v."
+              placeholder="Cử nhân, Thạc sĩ, Chứng chỉ ABC, v.v."
+              required
             />
           </div>
         </div>

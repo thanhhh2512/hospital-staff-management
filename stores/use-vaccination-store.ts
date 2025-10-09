@@ -81,7 +81,7 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
           date: vacc.date,
           location: vacc.location,
           notes: vacc.notes || "",
-          file: vacc.certificateUrl || null,
+          fileUrl: vacc.certificateUrl || null,
           nextDose: vacc.nextDose
         }));
 
@@ -113,7 +113,7 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
           date: response.data.date,
           location: response.data.location,
           notes: response.data.notes || "",
-          file: response.data.certificateUrl || null,
+          fileUrl: response.data.certificateUrl || null,
           nextDose: response.data.nextDose
         };
 
@@ -154,7 +154,7 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
           date: response.data.date,
           location: response.data.location,
           notes: response.data.notes || "",
-          file: response.data.certificateUrl || null,
+          fileUrl: response.data.certificateUrl || null,
           nextDose: response.data.nextDose
         };
 
@@ -201,7 +201,7 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
           date: response.data.date,
           location: response.data.location,
           notes: response.data.notes || "",
-          file: response.data.certificateUrl || null,
+          fileUrl: response.data.certificateUrl || null,
           nextDose: response.data.nextDose
         };
 

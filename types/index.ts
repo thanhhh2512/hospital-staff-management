@@ -12,25 +12,28 @@ export interface Employee {
 export interface Certificate {
   id: string;
   name: string;
-  type: "degree" | "certificate" | "other";
+  type: "DEGREE" | "CERTIFICATE" | "OTHER";
   issueDate: string;
   expiryDate?: string;
   issuer: string;
   description: string;
-  file: string | null;
+  fileUrl: string | null;
   employeeName?: string;
   employeeId?: string;
-  status?: "active" | "expired" | "pending";
+  status: "ACTIVE" | "EXPIRED" | "PENDING";
 }
 
 export interface TrainingHistory {
   id: string;
+  employeeId: string;
   school: string;
   major: string;
   startDate: string;
-  endDate: string;
-  type: string;
+  endDate?: string;
+  type: 'DEGREE' | 'CERTIFICATE' | 'COURSE' | 'OTHER';
   degree: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Vaccination {
@@ -39,7 +42,7 @@ export interface Vaccination {
   date: string;
   location: string;
   notes?: string;
-  file: string | null;
+  fileUrl: string | null;
   nextDose?: string;
 }
 
@@ -49,7 +52,7 @@ export interface VaccinationCertificate {
   issueDate: string;
   expiryDate?: string;
   issuer: string;
-  file: string | null;
+  fileUrl: string | null;
 }
 
 export interface VaccinationFormData {

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 interface TrainingFilters {
   search?: string;
-  type?: string;
+  type?: "DEGREE" | "CERTIFICATE" | "COURSE" | "OTHER";
   employeeId?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
@@ -14,12 +14,12 @@ interface TrainingFilters {
 }
 
 interface TrainingFormData {
-  employeeId?: string;
+  employeeId: string;
   school: string;
   major: string;
   startDate: string;
-  endDate: string;
-  type: string;
+  endDate?: string;
+  type: "DEGREE" | "CERTIFICATE" | "COURSE" | "OTHER";
   degree: string;
 }
 
@@ -38,16 +38,33 @@ interface TrainingState {
   } | null;
 
   // Actions
-  fetchTrainings: (filters?: TrainingFilters) => Promise<void>;
+  fetchTrainingsByEmployeeId: (employeeId: string, params?: { page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc" }) => Promise<void>;
   fetchTraining: (id: string) => Promise<void>;
-  createTraining: (data: TrainingFormData) => Promise<boolean>;
-  updateTraining: (id: string, data: Partial<TrainingFormData>) => Promise<boolean>;
+  createTraining: (data: Omit<TrainingHistory, 'id' | 'createdAt' | 'updatedAt'>) => Promise<boolean>;
+  updateTraining: (id: string, data: Partial<TrainingHistory>) => Promise<boolean>;
   deleteTraining: (id: string) => Promise<boolean>;
   selectTraining: (training: TrainingHistory | null) => void;
   clearError: () => void;
+
+  // Legacy methods for backward compatibility
+  fetchTrainings: (filters?: TrainingFilters) => Promise<void>;
   setTrainings: (trainings: TrainingHistory[]) => void;
   addTraining: (training: TrainingHistory) => void;
 }
+
+// Helper function to map backend data to frontend format
+const mapTrainingFromApi = (apiData: any): TrainingHistory => ({
+  id: apiData._id,
+  employeeId: apiData.employeeId,
+  school: apiData.school,
+  major: apiData.major,
+  startDate: apiData.startDate.split('T')[0], // Convert to YYYY-MM-DD
+  endDate: apiData.endDate ? apiData.endDate.split('T')[0] : undefined, // Convert to YYYY-MM-DD
+  type: apiData.type as "DEGREE" | "CERTIFICATE" | "COURSE" | "OTHER",
+  degree: apiData.degree,
+  createdAt: apiData.createdAt,
+  updatedAt: apiData.updatedAt,
+});
 
 export const useTrainingStore = create<TrainingState>((set, get) => ({
   trainings: [],
@@ -56,27 +73,29 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
   error: null,
   pagination: null,
 
-  fetchTrainings: async (filters?: TrainingFilters): Promise<void> => {
+  fetchTrainingsByEmployeeId: async (employeeId: string, params?: { page?: number; limit?: number; sortBy?: string; sortOrder?: "asc" | "desc" }): Promise<void> => {
     set({ isLoading: true, error: null });
 
     try {
-      const params: Record<string, any> = {};
+      const queryParams: Record<string, any> = {
+        page: params?.page || 1,
+        limit: params?.limit || 10,
+        sortBy: params?.sortBy || 'startDate',
+        sortOrder: params?.sortOrder || 'desc',
+      };
 
-      if (filters?.search) params.search = filters.search;
-      if (filters?.type) params.type = filters.type;
-      if (filters?.employeeId) params.employeeId = filters.employeeId;
-      if (filters?.sortBy) params.sortBy = filters.sortBy;
-      if (filters?.sortOrder) params.sortOrder = filters.sortOrder;
-      if (filters?.page) params.page = filters.page;
-      if (filters?.limit) params.limit = filters.limit;
+      const response: PaginatedResponse<any> = await api.get(`/trainings/employee/${employeeId}`, queryParams);
 
-      set({
-        trainings: [],
-        pagination: null,
-        isLoading: false,
-        error: null,
-      });
+      if (response.success) {
+        const mappedTrainings = response.data.map(mapTrainingFromApi);
 
+        set({
+          trainings: mappedTrainings,
+          pagination: response.pagination,
+          isLoading: false,
+          error: null,
+        });
+      }
     } catch (error: any) {
       set({
         isLoading: false,
@@ -89,11 +108,17 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      set({
-        selectedTraining: null,
-        isLoading: false,
-        error: null,
-      });
+      const response: ApiResponse<any> = await api.get(`/trainings/${id}`);
+
+      if (response.success && response.data) {
+        const training = mapTrainingFromApi(response.data);
+
+        set({
+          selectedTraining: training,
+          isLoading: false,
+          error: null,
+        });
+      }
     } catch (error: any) {
       set({
         isLoading: false,
@@ -102,14 +127,42 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     }
   },
 
-  createTraining: async (data: TrainingFormData): Promise<boolean> => {
+  createTraining: async (data: Omit<TrainingHistory, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> => {
     set({ isLoading: true, error: null });
 
     try {
-      set({ isLoading: false, error: null });
-      toast.success("Training record created successfully");
-      return true;
+      const payload = {
+        employeeId: data.employeeId,
+        school: data.school,
+        major: data.major,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        type: data.type,
+        degree: data.degree,
+      };
 
+      const response: ApiResponse<any> = await api.post("/trainings", payload);
+
+      if (response.success && response.data) {
+        const newId = response.data._id;
+
+        // Immediately fetch the created record to get the canonical version
+        const fetchResponse: ApiResponse<any> = await api.get(`/trainings/${newId}`);
+
+        if (fetchResponse.success && fetchResponse.data) {
+          const newTraining = mapTrainingFromApi(fetchResponse.data);
+
+          set((state) => ({
+            trainings: [...state.trainings, newTraining],
+            isLoading: false,
+            error: null,
+          }));
+
+          return true;
+        }
+      }
+
+      return false;
     } catch (error: any) {
       set({
         isLoading: false,
@@ -119,14 +172,42 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     }
   },
 
-  updateTraining: async (id: string, data: Partial<TrainingFormData>): Promise<boolean> => {
+  updateTraining: async (id: string, data: Partial<TrainingHistory>): Promise<boolean> => {
     set({ isLoading: true, error: null });
 
     try {
-      set({ isLoading: false, error: null });
-      toast.success("Training record updated successfully");
-      return true;
+      const payload: any = {};
+      if (data.employeeId) payload.employeeId = data.employeeId;
+      if (data.school) payload.school = data.school;
+      if (data.major) payload.major = data.major;
+      if (data.startDate) payload.startDate = data.startDate;
+      if (data.endDate !== undefined) payload.endDate = data.endDate;
+      if (data.type) payload.type = data.type;
+      if (data.degree) payload.degree = data.degree;
 
+      const response: ApiResponse<any> = await api.put(`/trainings/${id}`, payload);
+
+      if (response.success) {
+        // Immediately fetch the updated record to get the canonical version
+        const fetchResponse: ApiResponse<any> = await api.get(`/trainings/${id}`);
+
+        if (fetchResponse.success && fetchResponse.data) {
+          const updatedTraining = mapTrainingFromApi(fetchResponse.data);
+
+          set((state) => ({
+            trainings: state.trainings.map((training) =>
+              training.id === id ? updatedTraining : training
+            ),
+            selectedTraining: state.selectedTraining?.id === id ? updatedTraining : state.selectedTraining,
+            isLoading: false,
+            error: null,
+          }));
+
+          return true;
+        }
+      }
+
+      return false;
     } catch (error: any) {
       set({
         isLoading: false,
@@ -140,11 +221,21 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
+      const response: ApiResponse = await api.delete(`/trainings/${id}`);
 
-      set({ isLoading: false, error: null });
-      toast.success("Training record deleted successfully");
-      return true;
+      if (response.success) {
+        set((state) => ({
+          trainings: state.trainings.filter((training) => training.id !== id),
+          selectedTraining: state.selectedTraining?.id === id ? null : state.selectedTraining,
+          isLoading: false,
+          error: null,
+        }));
 
+        toast.success("Training record deleted successfully");
+        return true;
+      }
+
+      return false;
     } catch (error: any) {
       set({
         isLoading: false,
@@ -156,6 +247,27 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
 
   selectTraining: (training) => set({ selectedTraining: training }),
   clearError: () => set({ error: null }),
+
+  // Legacy methods for backward compatibility
+  fetchTrainings: async (filters?: TrainingFilters): Promise<void> => {
+    if (filters?.employeeId) {
+      return get().fetchTrainingsByEmployeeId(filters.employeeId, {
+        page: filters.page,
+        limit: filters.limit,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      });
+    }
+
+    // If no employeeId is provided, return empty results
+    set({
+      trainings: [],
+      pagination: null,
+      isLoading: false,
+      error: "Employee ID is required to fetch training records",
+    });
+  },
+
   setTrainings: (trainings) => set({ trainings }),
   addTraining: (training) =>
     set((state) => ({ trainings: [...state.trainings, training] })),

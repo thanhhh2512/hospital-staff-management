@@ -68,7 +68,7 @@ export function VaccinationDetail({
             </>
           )}
 
-          {vaccination.file && (
+          {vaccination.fileUrl && (
             <>
               <Separator />
               <div>
@@ -83,7 +83,7 @@ export function VaccinationDetail({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => onViewFile?.(vaccination.file!)}
+                    onClick={() => onViewFile?.(vaccination.fileUrl!)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
                     Xem
