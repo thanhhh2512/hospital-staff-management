@@ -1,7 +1,7 @@
 import type React from "react";
-import { ClientSidebar } from "@/components/client-sidebar";
+import { ClientSidebar } from "@/components/client/client-sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
-import { ClientGuard } from "@/components/client-guard";
+import { ClientGuard } from "@/components/client/client-guard";
 
 export default function ClientLayout({
   children,

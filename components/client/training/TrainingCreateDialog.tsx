@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TrainingForm } from "@/components/training/TrainingForm";
+import { TrainingForm } from "@/components/client/training/TrainingForm";
 import type { TrainingHistory } from "@/types";
 
 interface TrainingCreateDialogProps {

@@ -1,5 +1,5 @@
-import CertificateContent from "@/components/certificates/CertificateContent"
+import CertificateContent from "@/components/client/certificates/CertificateContent";
 
 export default function CertificatePage() {
-  return <CertificateContent/>
+  return <CertificateContent />;
 }

@@ -7,7 +7,7 @@ import {
   JobDescriptionCard,
   JobDescriptionViewer,
   EmptyState,
-} from "@/components/job-description";
+} from "@/components/client/job-description";
 import { useJobStore } from "@/stores";
 import type { JobDescription } from "@/types";
 

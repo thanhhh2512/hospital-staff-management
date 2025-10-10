@@ -1,10 +1,10 @@
 import jsPDF from "jspdf";
 // Import jspdf-autotable default export
 import autoTable from "jspdf-autotable";
-import vietnameseFont from "../../public/fonts/times-vietnamese";
+import vietnameseFont from "../../../public/fonts/times-vietnamese";
 
 // Import type JobDescription từ components/job-description
-import { JobDescription } from "@/components/job-description/types";
+import { JobDescription } from "@/components/client/job-description/types";
 
 // Type for jsPDF with autoTable
 type jsPDFWithAutoTable = jsPDF & {
@@ -111,7 +111,7 @@ export const generatePDF = async (
           values[0]?.textContent ?? "",
           values[1]?.textContent ?? "",
           card.querySelector("p.text-sm.text-muted-foreground")?.textContent ??
-            "",
+          "",
         ];
         certData.push(row);
       });

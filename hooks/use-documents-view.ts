@@ -75,7 +75,7 @@ export const useDocumentsView = () => {
             uploadDate: vacc.date,
             status: "active",
             description: vacc.notes,
-            file: vacc.fileUrl,
+            file: vacc.fileUrl ?? null,
             sourceType: "vaccination",
             sourceId: vacc.id,
           });

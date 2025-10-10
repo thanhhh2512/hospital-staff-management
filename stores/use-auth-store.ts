@@ -114,22 +114,44 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             // Call logout endpoint if token exists
             const token = TokenManager.getAccessToken();
             if (token) {
-                await api.post("/auth/logout");
+                await api.post("/auth/logout", {});
+            }
+        } catch (error: any) {
+            // Ignore logout API errors for 401/403 (already logged out server-side)
+            // or network errors - proceed with client logout regardless
+            console.warn("Logout API call failed, proceeding with client logout:", error);
+        }
+
+        // Always clear local state regardless of API response
+        TokenManager.clearTokens();
+        
+        // Clear user-scoped caches/stores
+        try {
+            // Only call reset methods if they exist
+            const { useProfileStore } = await import('./use-profile-store');
+            const profileStore = useProfileStore.getState();
+            if (typeof profileStore.resetProfile === 'function') {
+                profileStore.resetProfile();
             }
         } catch (error) {
-            // Ignore logout API errors - proceed with client logout
-        } finally {
-            // Clear tokens and state regardless of API response
-            TokenManager.clearTokens();
-            set({
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                error: null,
-            });
-
-            toast.success("Logged out successfully");
+            // Store may not exist or resetProfile may not be available
+            console.warn("Could not reset profile store:", error);
         }
+
+        set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+        });
+
+        // Redirect to login
+        if (typeof window !== 'undefined') {
+            // Use window.location for immediate redirect since we can't call useRouter outside component
+            window.location.replace('/login');
+        }
+
+        toast.success("Đăng xuất thành công");
     },
 
     refreshToken: async (): Promise<boolean> => {

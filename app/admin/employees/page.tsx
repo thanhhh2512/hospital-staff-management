@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/data-table";
 import { useToast } from "@/hooks/use-toast";
 import { ToastProvider } from "@/components/ui/toast";
-import { AddEmployeeDialog } from "@/components/admin-employees/AddEmployeeDialog";
-import { EditEmployeeDialog } from "@/components/admin-employees/EditEmployeeDialog";
-import { ViewEmployeeDialog } from "@/components/admin-employees/ViewEmployeeDialog";
-import { DeleteEmployeeDialog } from "@/components/admin-employees/DeleteEmployeeDialog";
-import { EmployeeFilters } from "@/components/admin-employees/EmployeeFilters";
-import { employeeColumns } from "@/components/admin-employees/EmployeeColumns";
+import { AddEmployeeDialog } from "@/components/admin/admin-employees/AddEmployeeDialog";
+import { EditEmployeeDialog } from "@/components/admin/admin-employees/EditEmployeeDialog";
+import { ViewEmployeeDialog } from "@/components/admin/admin-employees/ViewEmployeeDialog";
+import { DeleteEmployeeDialog } from "@/components/admin/admin-employees/DeleteEmployeeDialog";
+import { EmployeeFilters } from "@/components/admin/admin-employees/EmployeeFilters";
+import { employeeColumns } from "@/components/admin/admin-employees/EmployeeColumns";
 import { mockEmployees } from "@/schemas/mock-data";
 import type { Employee } from "@/types";
 

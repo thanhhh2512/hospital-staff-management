@@ -32,6 +32,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 // Định nghĩa kiểu dữ liệu cho trường tùy chỉnh
 interface CustomField {
@@ -293,12 +294,12 @@ export function AdminSidebar() {
           </div>
 
           <div className="absolute bottom-6 left-6 right-6">
-            <Link href="/login">
+            <LogoutButton asChild>
               <Button variant="outline" className="w-full justify-start gap-2">
                 <LogOut className="h-5 w-5" />
                 Đăng xuất
               </Button>
-            </Link>
+            </LogoutButton>
           </div>
         </div>
       </div>
@@ -426,12 +427,12 @@ export function AdminSidebar() {
           </div>
 
           <div className="mt-auto">
-            <Link href="/login">
+            <LogoutButton asChild>
               <Button variant="outline" className="w-full justify-start gap-2">
                 <LogOut className="h-5 w-5" />
                 Đăng xuất
               </Button>
-            </Link>
+            </LogoutButton>
           </div>
         </div>
       </div>

@@ -6,8 +6,8 @@ import {
   TrainingTable,
   TrainingCreateDialog,
   TrainingDeleteDialog,
-} from "@/components/training";
-import { generatePDF } from "@/components/profile/pdfUtils";
+} from "@/components/client/training";
+import { generatePDF } from "@/components/client/profile/pdfUtils";
 import { useTrainingStore } from "@/stores/use-training-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { PrintContainer } from "@/components/ui/print-container";

@@ -10,12 +10,12 @@ import {
   ToastTitle,
   ToastDescription,
 } from "@/components/ui/toast";
-import { jobColumns } from "@/components/admin-job/JobColumns";
-import { ViewJobDialog } from "@/components/admin-job/ViewJobDialog";
-import { AddJobDialog } from "@/components/admin-job/AddJobDialog";
-import { EditJobDialog } from "@/components/admin-job/EditJobDialog";
-import { ViewFileDialog } from "@/components/admin-job/ViewFileDialog";
-import { JobFilters } from "@/components/admin-job/JobFilters";
+import { jobColumns } from "@/components/admin/admin-job/JobColumns";
+import { ViewJobDialog } from "@/components/admin/admin-job/ViewJobDialog";
+import { AddJobDialog } from "@/components/admin/admin-job/AddJobDialog";
+import { EditJobDialog } from "@/components/admin/admin-job/EditJobDialog";
+import { ViewFileDialog } from "@/components/admin/admin-job/ViewFileDialog";
+import { JobFilters } from "@/components/admin/admin-job/JobFilters";
 import { useJobStore } from "@/stores/use-job-store";
 import type { JobAssignment } from "@/types";
 

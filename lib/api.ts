@@ -101,6 +101,7 @@ class ApiClient {
             const response = await fetch(url, {
                 ...options,
                 headers,
+                credentials: 'include', // Always include credentials for cookie-based auth
             });
 
             // Handle 401 - try to refresh token
@@ -112,6 +113,7 @@ class ApiClient {
                     const retryResponse = await fetch(url, {
                         ...options,
                         headers,
+                        credentials: 'include', // Always include credentials for cookie-based auth
                     });
                     return this.handleResponse<T>(retryResponse);
                 }

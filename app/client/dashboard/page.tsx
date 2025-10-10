@@ -8,7 +8,6 @@ import {
 import {
   Award,
   Briefcase,
-  FileText,
   Syringe,
   User,
   GraduationCap,

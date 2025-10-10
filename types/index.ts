@@ -38,12 +38,13 @@ export interface TrainingHistory {
 
 export interface Vaccination {
   id: string;
+  employeeId: string;
   name: string;
   date: string;
   location: string;
   notes?: string;
-  fileUrl: string | null;
-  nextDose?: string;
+  fileUrl?: string | null;
+  nextDose?: string | null;
 }
 
 export interface VaccinationCertificate {

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DataTable } from "@/components/data-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ViewDocumentDialog } from "@/components/admin-documents/ViewDocumentDialog";
+import { ViewDocumentDialog } from "@/components/admin/admin-documents/ViewDocumentDialog";
 import { useDocumentsView } from "@/hooks/use-documents-view";
 import { useEmployeeStore } from "@/stores";
 import type { DocumentView } from "@/types";

@@ -7,6 +7,13 @@ export function middleware(request: NextRequest) {
     // Fast, cookie-only check
     const token = request.cookies.get('hospital_access_token')?.value;
 
+    // Guard root path for unauthenticated users only
+    if (!token && pathname === '/') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        return NextResponse.redirect(url);
+    }
+
     // Guard admin area
     if (!token && pathname.startsWith('/admin')) {
         const url = request.nextUrl.clone();
@@ -23,9 +30,10 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    // Redirect authenticated users away from login/register
+    // Redirect authenticated users away from login/register to their dashboard
     if (token && (pathname === '/login' || pathname === '/register')) {
-        return NextResponse.redirect(new URL('/client/dashboard', request.url));
+        // Let the root page handle role-based redirection
+        return NextResponse.redirect(new URL('/', request.url));
     }
 
     return NextResponse.next();

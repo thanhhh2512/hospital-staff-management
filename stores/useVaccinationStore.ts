@@ -22,6 +22,7 @@ interface VaccinationState {
 const mockVaccinations: Vaccination[] = [
   {
     id: "1",
+    employeeId: "emp-001",
     name: "Vắc-xin COVID-19 (Pfizer)",
     date: "2021-08-15",
     location: "Trung tâm Y tế Quận Ninh Kiều",
@@ -31,6 +32,7 @@ const mockVaccinations: Vaccination[] = [
   },
   {
     id: "2",
+    employeeId: "emp-001",
     name: "Vắc-xin COVID-19 (Pfizer)",
     date: "2021-09-05",
     location: "Trung tâm Y tế Quận Ninh Kiều",

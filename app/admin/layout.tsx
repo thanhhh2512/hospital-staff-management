@@ -1,7 +1,7 @@
 import type React from "react";
-import { AdminSidebar } from "@/components/admin-sidebar";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
-import { AdminGuard } from "@/components/admin-guard";
+import { AdminGuard } from "@/components/admin/admin-guard";
 
 export default function AdminLayout({
   children,

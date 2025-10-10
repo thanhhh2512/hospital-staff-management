@@ -1,11 +1,21 @@
 import { create } from "zustand";
-import type { Vaccination } from "@/types";
 import { api, type ApiResponse, type PaginatedResponse } from "@/lib/api";
 import { toast } from "sonner";
 
+// Updated Vaccination type to match backend API
+interface Vaccination {
+  id: string;
+  employeeId: string;
+  name: string;
+  date: string;
+  location: string;
+  notes?: string;
+  fileUrl?: string | null;
+  nextDose?: string | null;
+}
+
 interface VaccinationFilters {
   search?: string;
-  employeeId?: string;
   dateFrom?: string;
   dateTo?: string;
   sortBy?: string;
@@ -19,10 +29,9 @@ interface VaccinationFormData {
   name: string;
   date: string;
   location: string;
-  batchNumber?: string;
-  nextDose?: string;
   notes?: string;
-  vaccination?: File;
+  file?: File;
+  nextDose?: string;
 }
 
 interface VaccinationState {
@@ -40,14 +49,14 @@ interface VaccinationState {
   } | null;
 
   fetchVaccinations: (filters?: VaccinationFilters) => Promise<void>;
-  fetchVaccination: (id: string) => Promise<void>;
+  fetchByEmployeeId: (employeeId: string, filters?: VaccinationFilters) => Promise<void>;
+  fetchById: (id: string) => Promise<void>;
   createVaccination: (data: VaccinationFormData) => Promise<boolean>;
   updateVaccination: (id: string, data: Partial<VaccinationFormData>) => Promise<boolean>;
   deleteVaccination: (id: string) => Promise<boolean>;
   selectVaccination: (vaccination: Vaccination | null) => void;
   clearError: () => void;
   setVaccinations: (vaccinations: Vaccination[]) => void;
-  addVaccination: (vaccination: Vaccination) => void;
 }
 
 export const useVaccinationStore = create<VaccinationState>((set, get) => ({
@@ -64,7 +73,6 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
       const params: Record<string, any> = {};
 
       if (filters?.search) params.search = filters.search;
-      if (filters?.employeeId) params.employeeId = filters.employeeId;
       if (filters?.dateFrom) params.dateFrom = filters.dateFrom;
       if (filters?.dateTo) params.dateTo = filters.dateTo;
       if (filters?.sortBy) params.sortBy = filters.sortBy;
@@ -76,13 +84,14 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
 
       if (response.success) {
         const mappedVaccinations = response.data.map((vacc: any) => ({
-          id: vacc.id,
-          name: vacc.name,
+          id: vacc._id || vacc.id,
+          employeeId: vacc.employeeId,
+          name: vacc.name || vacc.vaccineName,
           date: vacc.date,
           location: vacc.location,
           notes: vacc.notes || "",
-          fileUrl: vacc.certificateUrl || null,
-          nextDose: vacc.nextDose
+          fileUrl: vacc.fileUrl || null,
+          nextDose: vacc.nextDose || null
         }));
 
         set({
@@ -100,7 +109,60 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
     }
   },
 
-  fetchVaccination: async (id: string): Promise<void> => {
+  fetchByEmployeeId: async (employeeId: string, filters?: VaccinationFilters): Promise<void> => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const params: Record<string, any> = {};
+
+      if (filters?.search) params.search = filters.search;
+      if (filters?.dateFrom) params.dateFrom = filters.dateFrom;
+      if (filters?.dateTo) params.dateTo = filters.dateTo;
+      if (filters?.sortBy) params.sortBy = filters.sortBy;
+      if (filters?.sortOrder) params.sortOrder = filters.sortOrder;
+      if (filters?.page) params.page = filters.page;
+      if (filters?.limit) params.limit = filters.limit;
+
+      const response: PaginatedResponse<any> = await api.get(`/vaccinations/employee/${employeeId}`, params);
+
+      if (response.success) {
+        const mappedVaccinations = response.data.map((vacc: any) => ({
+          id: vacc._id || vacc.id,
+          employeeId: vacc.employeeId,
+          name: vacc.name || vacc.vaccineName,
+          date: vacc.date,
+          location: vacc.location,
+          notes: vacc.notes || "",
+          fileUrl: vacc.fileUrl || null,
+          nextDose: vacc.nextDose || null
+        }));
+
+        set({
+          vaccinations: mappedVaccinations,
+          pagination: response.pagination,
+          isLoading: false,
+          error: null,
+        });
+      }
+    } catch (error: any) {
+      // Handle 404 (no records) by setting empty list without showing error toast
+      if (error?.status === 404) {
+        set({
+          vaccinations: [],
+          pagination: null,
+          isLoading: false,
+          error: null,
+        });
+      } else {
+        set({
+          isLoading: false,
+          error: error?.message || "Failed to fetch vaccinations",
+        });
+      }
+    }
+  },
+
+  fetchById: async (id: string): Promise<void> => {
     set({ isLoading: true, error: null });
 
     try {
@@ -108,13 +170,14 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
 
       if (response.success && response.data) {
         const vaccination = {
-          id: response.data.id,
-          name: response.data.name,
+          id: response.data._id || response.data.id,
+          employeeId: response.data.employeeId,
+          name: response.data.name || response.data.vaccineName,
           date: response.data.date,
           location: response.data.location,
           notes: response.data.notes || "",
-          fileUrl: response.data.certificateUrl || null,
-          nextDose: response.data.nextDose
+          fileUrl: response.data.fileUrl || null,
+          nextDose: response.data.nextDose || null
         };
 
         set({
@@ -122,6 +185,13 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
           isLoading: false,
           error: null,
         });
+
+        // Update the vaccination in the list if it exists
+        set((state) => ({
+          vaccinations: state.vaccinations.map((vacc) =>
+            vacc.id === vaccination.id ? vaccination : vacc
+          ),
+        }));
       }
     } catch (error: any) {
       set({
@@ -137,33 +207,18 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
     try {
       const formData = new FormData();
       formData.append("employeeId", data.employeeId);
-      formData.append("name", data.name);
+      formData.append("vaccineName", data.name);
       formData.append("date", data.date);
       formData.append("location", data.location);
-      if (data.batchNumber) formData.append("batchNumber", data.batchNumber);
       if (data.nextDose) formData.append("nextDose", data.nextDose);
       if (data.notes) formData.append("notes", data.notes);
-      if (data.vaccination) formData.append("vaccination", data.vaccination);
+      if (data.file) formData.append("vaccination", data.file);
 
       const response: ApiResponse<any> = await api.postFormData("/vaccinations", formData);
 
       if (response.success && response.data) {
-        const newVaccination = {
-          id: response.data.id,
-          name: response.data.name,
-          date: response.data.date,
-          location: response.data.location,
-          notes: response.data.notes || "",
-          fileUrl: response.data.certificateUrl || null,
-          nextDose: response.data.nextDose
-        };
-
-        set((state) => ({
-          vaccinations: [...state.vaccinations, newVaccination],
-          isLoading: false,
-          error: null,
-        }));
-
+        // Immediately fetch the employee's vaccination list to get real-time updates
+        await get().fetchByEmployeeId(data.employeeId);
         toast.success("Vaccination record created successfully");
         return true;
       }
@@ -174,6 +229,7 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
         isLoading: false,
         error: error?.message || "Failed to create vaccination record",
       });
+      toast.error(error?.message || "Failed to create vaccination record");
       return false;
     }
   },
@@ -184,36 +240,28 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
     try {
       const formData = new FormData();
       if (data.employeeId) formData.append("employeeId", data.employeeId);
-      if (data.name) formData.append("name", data.name);
+      if (data.name) formData.append("vaccineName", data.name);
       if (data.date) formData.append("date", data.date);
       if (data.location) formData.append("location", data.location);
-      if (data.batchNumber) formData.append("batchNumber", data.batchNumber);
       if (data.nextDose) formData.append("nextDose", data.nextDose);
       if (data.notes) formData.append("notes", data.notes);
-      if (data.vaccination) formData.append("vaccination", data.vaccination);
+      if (data.file) formData.append("vaccination", data.file);
 
       const response: ApiResponse<any> = await api.putFormData(`/vaccinations/${id}`, formData);
 
       if (response.success && response.data) {
-        const updatedVaccination = {
-          id: response.data.id,
-          name: response.data.name,
-          date: response.data.date,
-          location: response.data.location,
-          notes: response.data.notes || "",
-          fileUrl: response.data.certificateUrl || null,
-          nextDose: response.data.nextDose
-        };
-
-        set((state) => ({
-          vaccinations: state.vaccinations.map((vacc) =>
-            vacc.id === id ? updatedVaccination : vacc
-          ),
-          selectedVaccination: state.selectedVaccination?.id === id ? updatedVaccination : state.selectedVaccination,
-          isLoading: false,
-          error: null,
-        }));
-
+        // Get the employeeId from the response data or current vaccinations list
+        const employeeId = response.data.employeeId || 
+                          get().vaccinations.find(v => v.id === id)?.employeeId;
+        
+        if (employeeId) {
+          // Immediately fetch the employee's vaccination list to get real-time updates
+          await get().fetchByEmployeeId(employeeId);
+        } else {
+          // Fallback: fetch the single record
+          await get().fetchById(id);
+        }
+        
         toast.success("Vaccination record updated successfully");
         return true;
       }
@@ -224,6 +272,7 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
         isLoading: false,
         error: error?.message || "Failed to update vaccination record",
       });
+      toast.error(error?.message || "Failed to update vaccination record");
       return false;
     }
   },
@@ -252,6 +301,7 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
         isLoading: false,
         error: error?.message || "Failed to delete vaccination record",
       });
+      toast.error(error?.message || "Failed to delete vaccination record");
       return false;
     }
   },
@@ -259,6 +309,4 @@ export const useVaccinationStore = create<VaccinationState>((set, get) => ({
   selectVaccination: (vaccination) => set({ selectedVaccination: vaccination }),
   clearError: () => set({ error: null }),
   setVaccinations: (vaccinations) => set({ vaccinations }),
-  addVaccination: (vaccination) =>
-    set((state) => ({ vaccinations: [...state.vaccinations, vaccination] })),
 }));

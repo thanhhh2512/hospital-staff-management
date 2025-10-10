@@ -6,8 +6,8 @@ import {
   CertificateList,
   CertificateForm,
   CertificateDetail,
-} from "@/components/certificates";
-import { generatePDF } from "@/components/profile/pdfUtils";
+} from "@/components/client/certificates";
+import { generatePDF } from "@/components//client/profile/pdfUtils";
 import { useCertificateStore } from "@/stores/use-certificate-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { PrintContainer } from "@/components/ui/print-container";

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Eye, Download } from "lucide-react";
 import type { JobDescription } from "@/types";
-import { generateJobDescriptionPDF } from "@/components/profile/pdfUtils";
+import { generateJobDescriptionPDF } from "@/components/client/profile/pdfUtils";
 
 interface JobDescriptionCardProps {
   job: JobDescription;

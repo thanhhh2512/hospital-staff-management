@@ -13,8 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ProfileEdit } from "@/components/profile/ProfileEdit";
-import { ProfilePreview } from "@/components/profile/ProfilePreview";
+import { ProfileEdit } from "@/components/client/profile/ProfileEdit";
+import { ProfilePreview } from "@/components/client/profile/ProfilePreview";
 import { useProfileStore } from "@/stores";
 import { useAuthStore } from "@/stores";
 import { useTrainingStore } from "@/stores";

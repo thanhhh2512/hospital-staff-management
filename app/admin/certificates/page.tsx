@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CertificateList } from "@/components/admin-certificates/CertificateList";
+import { CertificateList } from "@/components/admin/admin-certificates/CertificateList";
 import type { Certificate } from "@/types";
 import { mockCertificates } from "@/schemas/mock-data";
 

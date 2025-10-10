@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 interface CustomField {
   id: string;
@@ -140,12 +141,12 @@ export function ClientSidebar() {
             )}
           </div>
           <div className="absolute bottom-6 left-6 right-6">
-            <Link href="/login">
+            <LogoutButton asChild>
               <Button variant="outline" className="w-full justify-start gap-2">
                 <LogOut className="h-5 w-5" />
                 Đăng xuất
               </Button>
-            </Link>
+            </LogoutButton>
           </div>
         </div>
       </div>
@@ -198,12 +199,12 @@ export function ClientSidebar() {
           </nav>
 
           <div className="mt-auto">
-            <Link href="/login">
+            <LogoutButton asChild>
               <Button variant="outline" className="w-full justify-start gap-2">
                 <LogOut className="h-5 w-5" />
                 Đăng xuất
               </Button>
-            </Link>
+            </LogoutButton>
           </div>
         </div>
       </div>
